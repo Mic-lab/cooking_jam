@@ -10,11 +10,8 @@ from ..config import COLORS
 from ..font import FONTS
 from ..timer import Timer
 from ..utils import lerp
+from ..ingredient import Ingredient
 
-class Ingredient(Entity):
-
-    def __init__(self, name):
-        super().__init__((0, 0), name, 'idle')
 
 class Customer(Entity):
 
@@ -46,7 +43,7 @@ class Customer(Entity):
         # r.h -= 2
         # pygame.draw.rect(s, COLORS['ground'], r, width=1)
         #
-        txt_1 = f'{self.dialogue[1]}'
+        txt_1 = f'{self.dialogue[1]}\n\nIngredients :'
         font_surf_1 = FONTS['basic'].get_surf(txt_1, wraplength=150, color=COLORS['black1'])
 
         txt_2 = 'Ingredients:'
@@ -54,11 +51,13 @@ class Customer(Entity):
             txt_2 += f'\n{quantity}x {ingredient}'
         font_surf_2 = FONTS['basic'].get_surf(txt_2, wraplength=150, color=COLORS['blue1'])
 
+        font_surf_2 = Ingredient.get_order_img(self.order)
+
         h = font_surf_1.get_height() + font_surf_2.get_height()
         s = pygame.Surface((154, h))
         s.fill(COLORS['white1'])
         s.blit(font_surf_1, (2, 2))
-        s.blit(font_surf_2, (2, font_surf_2.get_height()))
+        s.blit(font_surf_2, (2, font_surf_1.get_height()))
         # pygame.draw.aaline(s, COLORS['white'], (0+4, 15), (150-4, 15))
         return s
 
@@ -83,7 +82,8 @@ class Customer(Entity):
 
                 )
             )
-            surf.blit(dialogue_img, (2, 2))
+            dialogue_pos = (CANVAS_SIZE[0] - 200, CANVAS_SIZE[1]*0.5 - 30)
+            surf.blit(dialogue_img, dialogue_pos)
         return super().render(surf)
 
 
@@ -92,9 +92,10 @@ class Game(State):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        # rects = [pygame.Rect(30, 30+i*30, 80, 20) for i in range(4)]
+        w, h = 100, 20
+        self.btn_rect_center = pygame.Rect(CANVAS_SIZE[0]*0.5 - w * 0.5, 20, w, h)
+        self.btn_rect = pygame.Rect(CANVAS_SIZE[0] - 200, 80, w, h)
         self.buttons = {
-            # 'kitchen': Button(rects[0], 'Kitchen', 'basic'),
         }
 
         self.bg = Animation.img_db['bg']
@@ -114,6 +115,10 @@ class Game(State):
 
         if self.lvl_start_timer.done:
             self.customer.show_dialogue()
+            if self.customer.dialogue_timer.frame == 0:
+                self.buttons['kitchen'] = Button(self.btn_rect, 'Go to kitchen', 'basic')
+                self.buttons['kitchen'].alpha = 0
+
         else:
             # self.customer.real_pos[1] = lerp(self.customer.real_pos[1],
             #                                  CANVAS_SIZE[1]*0.5 - self.customer.rect.h*0.5,
@@ -126,13 +131,20 @@ class Game(State):
         self.customer.update()
         self.customer.render(canvas)
 
+
+
         # Update Buttons
         for key, btn in self.buttons.items():
             btn.update(self.handler.inputs)
             btn.render(self.handler.canvas)
 
+            if key == 'kitchen':
+                btn.alpha += 5
+
             if btn.clicked:
                 if key == 'kitchen':
                     self.handler.transition_to(self.handler.states.Kitchen)
+                    self.handler.lvl = self.lvl
+                    self.handler.order = self.customer.order
 
         self.lvl_start_timer.update()

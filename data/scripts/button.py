@@ -3,19 +3,15 @@ import colorsys
 from copy import deepcopy
 from .font import FONTS
 from . import sfx
+from .config import COLORS
 
 class Button:
     
     presets = {
         'basic': {
-            'colors': {'border': [23, 25, 27], 
-                       'fill': [74, 138, 99], 
-                       'text': [127, 235, 144]}
-        },
-        'basic': {
-            'colors': {'border': [91, 77, 76], 
-                       'fill': [151, 134, 125], 
-                       'text': [240, 240, 240] }
+            'colors': {'border': COLORS['blue2'], 
+                       'fill': COLORS['black2'], 
+                       'text': COLORS['white2'] }
         },
     }
     
@@ -27,6 +23,7 @@ class Button:
         self.clicked = False
         self.released = False
         self.generate_surf()
+        self.alpha = 255
 
     @property
     def state(self):
@@ -96,7 +93,9 @@ class Button:
             self.generate_surf()
                 
     def render(self, surf):
-        surf.blit(self.surf, self.rect.topleft)
+        s = self.surf.copy()
+        s.set_alpha(self.alpha)
+        surf.blit(s, self.rect.topleft)
     
     @staticmethod
     def rgb_to_hsv(rgb):
