@@ -1,0 +1,22 @@
+{ "frames": [
+   {
+    "filename": "idle",
+    "frame": { "x": 0, "y": 0, "w": 37, "h": 71 },
+    "rotated": false,
+    "trimmed": true,
+    "spriteSourceSize": { "x": 45, "y": 36, "w": 37, "h": 71 },
+    "sourceSize": { "w": 128, "h": 128 },
+    "duration": 100
+   }
+ ],
+ "meta": {
+  "app": "http://www.aseprite.org/",
+  "version": "1.x-dev",
+  "image": "customer_0.png",
+  "format": "RGBA8888",
+  "size": { "w": 37, "h": 71 },
+  "scale": "1",
+  "slices": [
+  ]
+ }
+}
