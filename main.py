@@ -1,10 +1,14 @@
 import sys
 import pygame
+from pygame import Vector2 as Vec2
 from data.scripts import config
 from data.scripts import utils
 from data.scripts.mgl import shader_handler
 from data.scripts import game_states
 from data.scripts.transition import Transition, TransitionState
+from data.scripts.animation import Animation
+
+pygame.mouse.set_visible(False)
 
 class GameHandler:
 
@@ -66,11 +70,17 @@ class GameHandler:
     def run(self):
         self.running = True
 
+        self.mouse_img = (Animation.img_db['mouse_1'], Animation.img_db['mouse_2'])
+
         while self.running:
             self.handle_input()
 
             if self.transition.state != TransitionState.STARTING:
                 self.state.update()
+
+            i = 1 if self.inputs['held'].get('mouse1') else 0
+            self.canvas.blit(self.mouse_img[i], self.inputs['mouse pos'] - Vec2(4, 0))
+
 
             self.handle_transition()
 

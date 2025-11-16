@@ -29,6 +29,8 @@ class Ingredient(Entity):
         return s
 
     def update(self, inputs, grid, selected_ingredient):
+        self.old_pos = self.real_pos.copy()
+
         if inputs['released']['mouse1']:
             self.selected = False
             if self.hovered_cell:
@@ -54,6 +56,10 @@ class Ingredient(Entity):
                         self.hovered_cell = (col, row, rect, empty)
                         break
 
+        vel = self.real_pos - self.old_pos
+        self.angle += vel.x * 0.8
+        self.angle *= 0.6
+
     DESCRIPTION_SURF_W = 200
     def get_description_surf(self):
         name_surf = FONTS['basic'].get_surf(self.name.title() + f'    (+{self.points})', COLORS['blue4'])
@@ -78,6 +84,15 @@ class Ingredient(Entity):
         self.grid_pos = None
         self.points = 0
         self.description_surf = self.get_description_surf()
+        self.angle = 0
+
+    def render(self, surf):
+        img = self.img
+        angle = round(self.angle)
+        if angle != 0:
+            img = pygame.transform.rotate(img, angle)
+        offset = 0.5 * (Vec2(img.get_size()) - self.img.get_size())
+        surf.blit(img, self.pos - offset)
 
     def set_points(self, new_points):
         self.points = new_points
