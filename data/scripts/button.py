@@ -44,9 +44,10 @@ class Button:
             modes = deepcopy(self.presets[self.preset]['colors'])
                         
             for key, color in modes.items():    
+                # if key == 'fill': continue
                 color = self.rgb_to_hsv(color)
-                color[0] += change * 0.04
-                color[1] += change * 0.06
+                color[0] -= change * 0.04
+                color[1] += change * -0.03
                 color[2] += change * 0.08
 
                 if color[2] > 1:

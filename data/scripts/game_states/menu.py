@@ -19,7 +19,7 @@ class Menu(State):
         rects = [pygame.Rect(30, 30+i*30, 110, 20) for i in range(6)]
         self.buttons = {
             'game': Button(rects[0], 'harloo', 'basic'),
-            'scale': Button(rects[1], f'Window Scale ({config.SCALE}x)', 'basic'),
+            'scale': Button(rects[1], f'Window Scale ({config.scale}x)', 'basic'),
         }
         self.surf = Entity((0, 0), 'test')
         self.entity = PhysicsEntity(pos=(150, 30), name='side', action='idle')
@@ -69,12 +69,13 @@ class Menu(State):
                 elif key == 'stop':
                     pygame.mixer.music.fadeout(1000)
                 elif key == 'scale':
-                    config.SCALE = (config.SCALE + 1) % 5
-                    if config.SCALE == 0: config.SCALE = 1
-                    config.SCREEN_SIZE = config.SCALE*config.CANVAS_SIZE[0], config.SCALE*config.CANVAS_SIZE[1]
+                    config.scale = (config.scale + 1) % 5
+                    if config.scale == 0: config.scale = 1
+                    config.SCREEN_SIZE = config.scale*config.CANVAS_SIZE[0], config.scale*config.CANVAS_SIZE[1]
                     screen.screen = screen.create_screen()
                     shader_handler.ctx.viewport = (0, 0, config.SCREEN_SIZE[0], config.SCREEN_SIZE[1])
-                    btn.text = f'Window Scale ({config.SCALE}x)'
+                    btn.text = f'Window Scale ({config.scale}x)'
+                    shader_handler.vars['scale'] = config.scale
 
         self.entity.vel = [0, 0]
         if self.handler.inputs['held'].get('a'):

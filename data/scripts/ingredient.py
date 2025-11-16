@@ -34,8 +34,8 @@ class Ingredient(Entity):
             if self.hovered_cell:
                 if self.hovered_cell[3]:
                     self.real_pos = self.hovered_cell[2].center - 0.5*Vec2(self.rect.size)
-                    grid.add_ingredient(self, self.hovered_cell[0], self.hovered_cell[1])
                     self.grid_pos = self.hovered_cell[0], self.hovered_cell[1]
+                    grid.add_ingredient(self, self.hovered_cell[0], self.hovered_cell[1])
                     self.hovered_cell = None
         elif inputs['pressed']['mouse1']:
             if self.rect.collidepoint(inputs['mouse pos']) and not selected_ingredient:
@@ -56,7 +56,7 @@ class Ingredient(Entity):
 
     DESCRIPTION_SURF_W = 200
     def get_description_surf(self):
-        name_surf = FONTS['basic'].get_surf(self.name.title(), COLORS['blue4'])
+        name_surf = FONTS['basic'].get_surf(self.name.title() + f'    (+{self.points})', COLORS['blue4'])
         font_surf = FONTS['basic'].get_surf(self.description,
                                             wraplength=self.DESCRIPTION_SURF_W,
                                             color=COLORS['white1'])
@@ -66,6 +66,7 @@ class Ingredient(Entity):
         surf.fill((*COLORS['black2'], 120))
         surf.blit(name_surf, (2, 2))
         surf.blit(font_surf, (2, name_surf.get_height()))
+        pygame.draw.rect(surf, COLORS['white1'], (0, 0, *surf.get_size()), width=1)
         return surf
 
     def __init__(self, name, description):
@@ -75,12 +76,32 @@ class Ingredient(Entity):
         self.selected = False
         self.hovered_cell = None
         self.grid_pos = None
+        self.points = 0
         self.description_surf = self.get_description_surf()
+
+    def set_points(self, new_points):
+        self.points = new_points
+        self.description_surf = self.get_description_surf()
+
+    def calculate_points(self):
+        pass
 
 class Bread(Ingredient):
     def __init__(self):
         description = '''+ 10 points if another bread is on the same line.'''
         super().__init__(name='bread', description=description)
+        
+    def calculate_points(self, grid):
+        points = 0
+        for row in range(grid.size[1]):
+            if self.grid_pos == (self.grid_pos[0], row): continue
+            if isinstance(grid.data[row][self.grid_pos[0]], Bread):
+                points += 10
+        for col in range(grid.size[0]):
+            if self.grid_pos == (col, self.grid_pos[1]): continue
+            if isinstance(grid.data[self.grid_pos[1]][col], Bread):
+                points += 10
+        return points
 
 name_map = {
     'bread': Bread

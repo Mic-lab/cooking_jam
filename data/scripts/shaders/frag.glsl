@@ -5,9 +5,11 @@ uniform float transitionTimer;
 uniform int transitionState;
 uniform float shakeTimer = -1.0;
 uniform float caTimer = -1.0;
+uniform int scale;
 in vec2 uvs;
 out vec4 f_color;
 
+const ivec2 CANVAS_SIZE = ivec2(512, 288);
 const float PI = 3.14159265359;
 const vec2 gridSize = vec2(64, 64);
 const float caCoef = 0.005;
@@ -25,6 +27,8 @@ float linearEase(float x) {
 void main() {
     f_color = vec4(texture(canvasTex, uvs).rgb, 1.0);
     float centerDist = distance(uvs, vec2(0.5, 0.5));
+    vec2 pxCoord = floor(vec2(CANVAS_SIZE.x * scale * uvs.x, CANVAS_SIZE.y * scale * uvs.y));
+    vec2 gxCoord = floor(pxCoord / scale) * scale;
 
     // Blurry shake
     if (shakeTimer >= 0) {
@@ -64,7 +68,13 @@ void main() {
         f_color.b *= clamp(2*tTimer, 0, 1);
         // f_color *= tTimer;
         // f_color.rb *= tTimer;
-
     }
+
+    // CRT
+    if (mod(pxCoord.y, scale) == 0) {
+        f_color.rgb = mix(f_color.rgb, vec3(0), 0.000000000001);
+        // f_color.rgb = vec3(0);
+    }
+
 }
 

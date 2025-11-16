@@ -18,7 +18,8 @@ class Customer(Entity):
 
     ORDERS = (
         {
-            'want': ((2, ingredient.Bread()), )
+            'want': ((2, ingredient.Bread()), ),
+            'points': 20,
         },
     )
         
