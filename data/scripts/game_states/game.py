@@ -22,7 +22,7 @@ class Customer(Entity):
     )
         
     DIALOGUES = (
-        ('kid', 'Hello. May I please have a sandwhich?'),
+        ('kid', 'Hello. May I please have a sandwhich, but without the filling'),
     )
 
     def __init__(self, *args, **kwargs):

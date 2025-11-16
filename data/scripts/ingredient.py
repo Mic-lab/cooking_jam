@@ -1,6 +1,8 @@
 from .entity import Entity
 from .config import COLORS
 from .font import FONTS
+from .animation import Animation
+from pygame import Vector2 as Vec2
 import pygame
 
 class Ingredient(Entity):
@@ -26,6 +28,35 @@ class Ingredient(Entity):
         s.blit(font_surf_2, (0, 0))
         return s
 
+    def update(self, inputs, grid, selected_ingredient):
+        if inputs['released']['mouse1']:
+            self.selected = False
+            if self.hovered_cell:
+                if self.hovered_cell[3]:
+                    self.real_pos = self.hovered_cell[2].center - 0.5*Vec2(self.rect.size)
+                    grid.add_ingredient(self, self.hovered_cell[0], self.hovered_cell[1])
+                    self.grid_pos = self.hovered_cell[0], self.hovered_cell[1]
+                    self.hovered_cell = None
+        elif inputs['pressed']['mouse1']:
+            if self.rect.collidepoint(inputs['mouse pos']) and not selected_ingredient:
+                grid.remove_ingredient(self)
+                self.selected = True
+
+        if self.selected:
+            self.real_pos = inputs['mouse pos'] - Vec2(self.rect.size) * 0.5
+
+            self.hovered_cell = None
+            for row in range(grid.size[1]):
+                for col in range(grid.size[0]):
+                    rect = grid.get_rect(row, col)
+                    if rect.collidepoint(self.rect.center):
+                        empty = grid.data[row][col] is None
+                        self.hovered_cell = (col, row, rect, empty)
+                        break
 
     def __init__(self, name):
-        super().__init__((0, 0), name, 'idle')
+        super().__init__((0, 0), name)
+        Animation.animation_db[self.name]['rect'] = pygame.Rect(0, 0, 23, 23)
+        self.selected = False
+        self.hovered_cell = None
+        self.grid_pos = None
