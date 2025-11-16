@@ -3,8 +3,10 @@ from pygame import Vector2 as Vec2
 from .state import State
 from ..button import Button
 from ..animation import Animation
+from .. import ingredient
 from ..ingredient import Ingredient
 from ..config import COLORS
+from ..timer import Timer
 
 class Grid:
 
@@ -52,7 +54,8 @@ class Kitchen(State):
     )
 
     INGREDIENTS = (
-        (Ingredient('bread'), Ingredient('bread'), Ingredient('tomato')),
+        (ingredient.Bread(), ingredient.Bread()),
+        # (Ingredient('bread'), Ingredient('bread'), Ingredient('tomato')),
 
     )
 
@@ -73,12 +76,15 @@ class Kitchen(State):
         self.grid = Grid(self.GRID_SIZES[self.lvl])
 
         self.selected_ingredient = None
+        self.saved_hovered_ingredient = None
+
+        self.hover_timer = Timer(duration=10)
 
         # Generate ingredient data ---------------
         self.ingredient_dict = {}
         for lvl in range(self.lvl + 1):
-            for ingredient in self.INGREDIENTS[lvl]:
-                name = ingredient.name
+            for ing in self.INGREDIENTS[lvl]:
+                name = ing.name
                 self.ingredient_dict[name] = self.ingredient_dict.get(name, 0) + 1
 
         print(f'{self.ingredient_dict=}')
@@ -87,10 +93,10 @@ class Kitchen(State):
         for row, (ingredient_name, quantity) in enumerate(self.ingredient_dict.items()):
             for i in range(quantity):
                 pos = self.INGREDIENT_BASE_POS + Vec2(0, 25) * row + Vec2(25, 0) * i
-                ingredient = Ingredient(ingredient_name)
-                ingredient.real_pos = pos
+                ing = ingredient.init_from_name(ingredient_name)
+                ing.real_pos = pos
                 self.ingredients.append(
-                    ingredient
+                    ing
                 )
 
     def get_order_img(self):
@@ -109,16 +115,16 @@ class Kitchen(State):
         #         from random import randint
         #         pygame.draw.rect(canvas, (30, 30, randint(1, 255)), r)
 
-
-        for ingredient in self.ingredients:
-            ingredient.update(self.handler.inputs, self.grid, self.selected_ingredient)
-            if ingredient.selected:
-                self.selected_ingredient = ingredient
-            elif ingredient is self.selected_ingredient:
+        hovered_ingredient = None
+        for ing in self.ingredients:
+            ing.update(self.handler.inputs, self.grid, self.selected_ingredient)
+            if ing.selected:
+                self.selected_ingredient = ing
+            elif ing is self.selected_ingredient:
                 self.selected_ingredient = None
 
-            if ingredient.hovered_cell:
-                hovered_cell = ingredient.hovered_cell
+            if ing.hovered_cell:
+                hovered_cell = ing.hovered_cell
                 rect = hovered_cell[2]
                 color = COLORS['blue4'] if hovered_cell[3] else (100, 0, 0, 100)
                 s = pygame.Surface(rect.size)
@@ -126,7 +132,24 @@ class Kitchen(State):
                 s.set_alpha(70)
                 canvas.blit(s, rect.topleft)
 
-            ingredient.render(canvas)
+            if ing.rect.collidepoint(self.handler.inputs['mouse pos']):
+                hovered_ingredient = ing
+                self.saved_hovered_ingredient = ing
+
+            ing.render(canvas)
+
+        if self.saved_hovered_ingredient:
+            if hovered_ingredient and hovered_ingredient is not self.selected_ingredient:
+                self.hover_timer.frame += 1
+            else:
+                self.hover_timer.frame -= 1
+            self.hover_timer.frame = max(min(self.hover_timer.frame, self.hover_timer.duration), 0)
+            self.hover_timer.done = self.hover_timer.duration == 1
+            self.saved_hovered_ingredient.description_surf.set_alpha(self.hover_timer.ratio * 255)
+            canvas.blit(
+                self.saved_hovered_ingredient.description_surf,
+                self.handler.inputs['mouse pos'] - 1*Vec2(Ingredient.DESCRIPTION_SURF_W, 0)
+            )
 
 
         # Update Buttons

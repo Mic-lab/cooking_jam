@@ -11,13 +11,14 @@ from ..font import FONTS
 from ..timer import Timer
 from ..utils import lerp
 from ..ingredient import Ingredient
+from .. import ingredient
 
 
 class Customer(Entity):
 
     ORDERS = (
         {
-            'want': ((2, Ingredient('bread'), ), )
+            'want': ((2, ingredient.Bread()), )
         },
     )
         

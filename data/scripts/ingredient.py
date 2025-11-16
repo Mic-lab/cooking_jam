@@ -54,9 +54,36 @@ class Ingredient(Entity):
                         self.hovered_cell = (col, row, rect, empty)
                         break
 
-    def __init__(self, name):
+    DESCRIPTION_SURF_W = 200
+    def get_description_surf(self):
+        name_surf = FONTS['basic'].get_surf(self.name.title(), COLORS['blue4'])
+        font_surf = FONTS['basic'].get_surf(self.description,
+                                            wraplength=self.DESCRIPTION_SURF_W,
+                                            color=COLORS['white1'])
+
+        h = font_surf.get_height() + name_surf.get_height()
+        surf = pygame.Surface((self.DESCRIPTION_SURF_W, h + 4), pygame.SRCALPHA)
+        surf.fill((*COLORS['black2'], 120))
+        surf.blit(name_surf, (2, 2))
+        surf.blit(font_surf, (2, name_surf.get_height()))
+        return surf
+
+    def __init__(self, name, description):
         super().__init__((0, 0), name)
         Animation.animation_db[self.name]['rect'] = pygame.Rect(0, 0, 23, 23)
+        self.description = description
         self.selected = False
         self.hovered_cell = None
         self.grid_pos = None
+        self.description_surf = self.get_description_surf()
+
+class Bread(Ingredient):
+    def __init__(self):
+        description = '''+ 10 points if another bread is on the same line.'''
+        super().__init__(name='bread', description=description)
+
+name_map = {
+    'bread': Bread
+}
+def init_from_name(name):
+    return name_map[name]()
