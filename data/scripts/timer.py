@@ -2,9 +2,14 @@ import math
 
 class Timer:
 
-    def __init__(self, duration):
+    def __init__(self, duration, done=False):
         self.duration = duration
-        self.reset()
+
+        if not done:
+            self.reset()
+        else:
+            self.frame = self.duration
+            self.done = True
 
     def reset(self):
         self.frame = 0
@@ -14,6 +19,11 @@ class Timer:
         if not self.done:
             self.frame += 1
         self.done = self.frame == self.duration
+
+    def get_ease_in_out_sin(self):
+        x = self.ratio
+        return -(math.cos((math.pi*x)) - 1) / 2
+
 
     def get_ease_squared(self):
         # return 1 - (1 - self.frame) ** 2

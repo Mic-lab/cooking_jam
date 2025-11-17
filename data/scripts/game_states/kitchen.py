@@ -52,11 +52,23 @@ class Grid:
     def calculate_points(self):
         print('Calculating points')
         points = 0
+
+        groups = {}
+
         for row in self.data:
             for ing in row:
                 if ing:
-                    ing.set_points(ing.calculate_points(self))
+                    if ing.group:
+                        if type(ing) in groups:
+                            ing.set_points(groups[type(ing)])
+                            continue
+                        else:
+                            groups[type(ing)] = ing.calculate_points(self)
+                            ing.set_points(groups[type(ing)])
+                    else:
+                        ing.set_points(ing.calculate_points(self))
                     points += ing.points
+
         self.points = points
         print(f'{points=}')
 
@@ -67,11 +79,21 @@ class Kitchen(State):
 
     GRID_SIZES = (
         (3, 3),
+        (3, 3),
+        (3, 3),
+        (3, 3),
+        (3, 3),
+        (3, 3),
+        (3, 3),
+        (3, 3),
+        (3, 3),
+        (3, 3),
+        (3, 3),
     )
 
     INGREDIENTS = (
         (ingredient.Bread(), ingredient.Bread()),
-        # (Ingredient('bread'), Ingredient('bread'), Ingredient('tomato')),
+        (ingredient.Bagel(), ingredient.Bagel())
 
     )
 
@@ -104,6 +126,7 @@ class Kitchen(State):
         # Generate ingredient data ---------------
         self.ingredient_dict = {}
         for lvl in range(self.lvl + 1):
+            print(f'{lvl=} {self.INGREDIENTS=}')
             for ing in self.INGREDIENTS[lvl]:
                 name = ing.name
                 self.ingredient_dict[name] = self.ingredient_dict.get(name, 0) + 1

@@ -62,7 +62,8 @@ class Ingredient(Entity):
 
     DESCRIPTION_SURF_W = 200
     def get_description_surf(self):
-        name_surf = FONTS['basic'].get_surf(self.name.title() + f'    (+{self.points})', COLORS['blue4'])
+        point_info = '  Collectively' if self.group else ''
+        name_surf = FONTS['basic'].get_surf(self.name.title() + f'    (+{self.points}{point_info})', COLORS['blue4'])
         font_surf = FONTS['basic'].get_surf(self.description,
                                             wraplength=self.DESCRIPTION_SURF_W,
                                             color=COLORS['white1'])
@@ -75,10 +76,11 @@ class Ingredient(Entity):
         pygame.draw.rect(surf, COLORS['white1'], (0, 0, *surf.get_size()), width=1)
         return surf
 
-    def __init__(self, name, description):
+    def __init__(self, name, description, group=False):
         super().__init__((0, 0), name)
         Animation.animation_db[self.name]['rect'] = pygame.Rect(0, 0, 23, 23)
         self.description = description
+        self.group = group
         self.selected = False
         self.hovered_cell = None
         self.grid_pos = None
@@ -101,6 +103,9 @@ class Ingredient(Entity):
     def calculate_points(self):
         pass
 
+    def calculate_points_group(self):
+        pass
+
 class Bread(Ingredient):
     def __init__(self):
         description = '''+ 10 points if another bread is on the same line.'''
@@ -120,35 +125,37 @@ class Bread(Ingredient):
 
 class Bagel(Ingredient):
     def __init__(self):
-        description = '''+5 points for every ingredient in between 2 pagels'''
-        super().__init__(name='Bagel', description=description)
+        description = '''+5 points for every ingredient in between bagels'''
+        super().__init__(name='bagel', description=description, group=True)
+
+    def calc_func(self, grid):
+        score = 0
+        first = False
+        for row in grid:
+            added_score = 0
+            for cell in row:
+                if cell is None: continue
+                if isinstance(cell, Bagel):
+                    if not first:
+                        first = True
+                        continue
+                    score += added_score
+                    added_score = 0
+                else:
+                    added_score += 5
+        return score
         
     def calculate_points(self, grid):
-        points = 0
+        score = 0
+        score += self.calc_func(grid.data)
+        transposed_grid = list(zip(*grid.data))
+        score += self.calc_func(transposed_grid)
+        return score
 
-        x_points_1 = 0
-        x_points_2 = 0
-        passed_self = False
-        for row in range(grid.size[1]):
-            if self.grid_pos == (col, self.grid_pos[1]):
-                passed_self = True
-                continue
-            item = grid.data[row][self.grid_pos[0]]
-            if item is None: continue
-            if not isinstance(item, Bagel):
-                if not passed_self:
-                    x_points_1 += 5
-                else:
-                    x_points_2 += 5
-            if self.grid_pos == (self.grid_pos[0], row): continue
-        for col in range(grid.size[0]):
-            if self.grid_pos == (col, self.grid_pos[1]): continue
-            if isinstance(grid.data[self.grid_pos[1]][col], Bread):
-                points += 10
-        return points
 
 name_map = {
-    'bread': Bread
+    'bread': Bread,
+    'bagel': Bagel
 }
 def init_from_name(name):
     return name_map[name]()

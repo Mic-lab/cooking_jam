@@ -18,6 +18,7 @@ class GameHandler:
         self.clock = pygame.time.Clock()
         self.inputs = {'pressed': {}, 'released': {}, 'held': {}}
         self.lvl = 0
+        self.lvl = 1
         self.set_state(self.states.Menu)
         self.set_state(self.states.Game)
         self.transition = Transition()

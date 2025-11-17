@@ -21,20 +21,28 @@ class Customer(Entity):
             'want': ((2, ingredient.Bread()), ),
             'points': 20,
         },
+        {
+            'want': ((2, ingredient.Bread()), (2, ingredient.Bagel()), ),
+            'points': 25,
+        },
     )
         
     DIALOGUES = (
         ('John Smith', 'Hello. May I please have a sandwhich, but without the filling',
          'Exactly as I asked for; thanks!'),
-        ('Bob', 'Hi, I\'d like a tomato bagel'),
+        ('Bob', 'Hi, I\'d like a sandwhich bagel (not be confused with a bagel sandwhich)',
+         'Oh yeah, that\'s the stuff'),
     )
 
     def __init__(self, *args, **kwargs):
+        name = kwargs['name']
+        n = int(name[-1])
+        kwargs['name'] = 'customer_0'
         super().__init__(*args, **kwargs)
-        n = int(self.name[-1])
         self.order = self.ORDERS[n]
         self.dialogue = self.DIALOGUES[n]
         self.dialogue_img = self.get_dialogue_img()
+        self.dialogue_img_2 = self.get_dialogue_img_2()
         self.showing_dialogue = False
 
     def get_dialogue_img(self):
@@ -65,7 +73,18 @@ class Customer(Entity):
         # pygame.draw.aaline(s, COLORS['white'], (0+4, 15), (150-4, 15))
         return s
 
-    def show_dialogue(self):
+    def get_dialogue_img_2(self):
+        txt_1 = f'{self.dialogue[2]}'
+        font_surf_1 = FONTS['basic'].get_surf(txt_1, wraplength=150, color=COLORS['black1'])
+
+        h = font_surf_1.get_height()
+        s = pygame.Surface((154, h))
+        s.fill(COLORS['white1'])
+        s.blit(font_surf_1, (2, 2))
+        return s
+
+    def show_dialogue(self, done=False):
+        self.done = done
         if self.showing_dialogue is False:
             self.showing_dialogue = True
             self.dialogue_timer = Timer(30)
@@ -78,11 +97,12 @@ class Customer(Entity):
     def render(self, surf):
         if self.showing_dialogue:
             ratio = self.dialogue_timer.easeOutElastic()
+            og_img = self.dialogue_img_2 if self.done else self.dialogue_img
             dialogue_img = pygame.transform.scale(
-                self.dialogue_img,
+                og_img,
                 (
-                    self.dialogue_img.get_width() * (0.5 + 0.5 * ratio),
-                    self.dialogue_img.get_height(),
+                    og_img.get_width() * (0.5 + 0.5 * ratio),
+                    og_img.get_height(),
 
                 )
             )
@@ -104,38 +124,69 @@ class Game(State):
 
         self.bg = Animation.img_db['bg']
         self.lvl = self.handler.lvl
-        self.start_level()
+        self.lvl_start_timer = Timer(60, done=True)
+        self.lvl_end_timer = Timer(120, done=True)
+        self.stall_timer = Timer(30, done=True)
+        if self.lvl == 0:
+            self.start_level()
+        else:
+            self.end_level()
+
+    def get_start_pos(self):
+        return [CANVAS_SIZE[0] * 0.5 - self.customer.img.get_width() * 0.5, CANVAS_SIZE[1]]
+        # return [CANVAS_SIZE[0] * 0.5 - self.customer.img.get_width() * 0.5, CANVAS_SIZE[1]-self.customer.rect.h]
+
+    def get_end_pos_y(self):
+        return CANVAS_SIZE[1]*0.5 - self.customer.rect.h*0.5
 
     def end_level(self):
-        pass
+        self.leaving = True
+        self.lvl_end_timer.reset()
+        name = f'customer_{self.lvl - 1}'
+        self.customer = Customer(pos=(0, 0), name=name, action='idle')
+        self.customer.real_pos = self.get_start_pos()
+        self.customer.real_pos[1] = self.get_end_pos_y()
+        self.start_pos = self.customer.real_pos.copy()
+
+        self.customer.show_dialogue(done=True)
 
     def start_level(self):
-        self.lvl_start_timer = Timer(duration=30)
+        self.leaving = False
+        self.lvl_start_timer.reset()
         name = f'customer_{self.lvl}'
-        name = 'customer_0'
         self.customer = Customer(pos=(0, 0), name=name, action='idle')
-        self.customer.real_pos = [CANVAS_SIZE[0] * 0.5 - self.customer.img.get_width() * 0.5, CANVAS_SIZE[1]-self.customer.rect.h]
-        self.START_POS = self.customer.real_pos.copy()
+        self.customer.real_pos = self.get_start_pos()
+        self.start_pos = self.customer.real_pos.copy()
 
 
     def sub_update(self):
         canvas = self.handler.canvas
         self.handler.canvas.blit(self.bg, (0, 0))
 
-        if self.lvl_start_timer.done:
-            self.customer.show_dialogue()
-            if self.customer.dialogue_timer.frame == 0:
-                self.buttons['kitchen'] = Button(self.btn_rect, 'Go to kitchen', 'basic')
-                self.buttons['kitchen'].alpha = 0
-
+        if self.leaving:
+            if not self.lvl_end_timer.done:
+                self.customer.real_pos[1] = lerp(self.start_pos[1],
+                                                 self.get_start_pos()[1],
+                                                 self.lvl_end_timer.get_ease_in_out_sin() * self.lvl_end_timer.ratio**10)
+            else:
+                self.stall_timer.reset()
+                self.start_level()
         else:
-            # self.customer.real_pos[1] = lerp(self.customer.real_pos[1],
-            #                                  CANVAS_SIZE[1]*0.5 - self.customer.rect.h*0.5,
-            #                                  self.lvl_start_timer.get_ease_squared())
 
-            self.customer.real_pos[1] = lerp(self.START_POS[1],
-                                             CANVAS_SIZE[1]*0.5 - self.customer.rect.h*0.5,
-                                             self.lvl_start_timer.get_ease_squared())
+            if self.lvl_start_timer.done:
+                self.customer.show_dialogue()
+                if self.customer.dialogue_timer.frame == 0:
+                    self.buttons['kitchen'] = Button(self.btn_rect, 'Go to kitchen', 'basic')
+                    self.buttons['kitchen'].alpha = 0
+
+            else:
+                # self.customer.real_pos[1] = lerp(self.customer.real_pos[1],
+                #                                  CANVAS_SIZE[1]*0.5 - self.customer.rect.h*0.5,
+                #                                  self.lvl_start_timer.get_ease_squared())
+
+                self.customer.real_pos[1] = lerp(self.start_pos[1],
+                                                 self.get_end_pos_y(),
+                                                 self.lvl_start_timer.get_ease_in_out_sin())
 
         self.customer.update()
         self.customer.render(canvas)
@@ -157,3 +208,4 @@ class Game(State):
                     self.handler.order = self.customer.order
 
         self.lvl_start_timer.update()
+        self.lvl_end_timer.update()
