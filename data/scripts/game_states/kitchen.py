@@ -127,7 +127,7 @@ class Kitchen(State):
     GRID_SIZES = (
         (3, 3),
         (3, 3),
-        (3, 3),
+        (3, 4),
         (3, 3),
         (3, 3),
         (3, 3),
@@ -140,7 +140,8 @@ class Kitchen(State):
 
     INGREDIENTS = (
         (ingredient.Bread(), ingredient.Bread()),
-        (ingredient.Bagel(), ingredient.Bagel(), ingredient.Bagel())
+        (ingredient.Bagel(), ingredient.Bagel()),
+        (ingredient.Tomato(), ingredient.Cucumber()),
 
     )
 

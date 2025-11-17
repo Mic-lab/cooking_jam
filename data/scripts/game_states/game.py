@@ -25,12 +25,18 @@ class Customer(Entity):
             'want': ((2, ingredient.Bread()), (2, ingredient.Bagel()), ),
             'points': 25,
         },
+        {
+            'want': ((2, ingredient.Cucumber()), (2, ingredient.Tomato()), ),
+            'points': 30,
+        },
     )
         
     DIALOGUES = (
         ('John Smith', 'Hello. May I please have a sandwhich, but without the filling',
          'Exactly as I asked for; thanks!'),
         ('Bob', 'Hi, I\'d like a sandwhich bagel (not be confused with a bagel sandwhich)',
+         'Oh yeah, that\'s the stuff'),
+        ('Bob', 'Salad',
          'Oh yeah, that\'s the stuff'),
     )
 

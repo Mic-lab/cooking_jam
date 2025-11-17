@@ -50,7 +50,7 @@ class Ingredient(Entity):
             self.hovered_cell = None
             for row in range(grid.size[1]):
                 for col in range(grid.size[0]):
-                    rect = grid.get_rect(row, col)
+                    rect = grid.get_rect(col, row)
                     if rect.collidepoint(self.rect.center):
                         empty = grid.data[row][col] is None
                         self.hovered_cell = (col, row, rect, empty)
@@ -100,11 +100,11 @@ class Ingredient(Entity):
         self.points = new_points
         self.description_surf = self.get_description_surf()
 
-    def calculate_points(self):
-        pass
+    def calculate_points(self, grid):
+        return 0
 
-    def calculate_points_group(self):
-        pass
+    def calculate_points_group(self, grid):
+        return 0
 
 class Bread(Ingredient):
     def __init__(self):
@@ -152,10 +152,21 @@ class Bagel(Ingredient):
         score += self.calc_func(transposed_grid)
         return score
 
+class Tomato(Ingredient):
+    def __init__(self):
+        description = '''.'''
+        super().__init__(name='tomato', description=description)
+
+class Cucumber(Ingredient):
+    def __init__(self):
+        description = '''.'''
+        super().__init__(name='cucumber', description=description)
 
 name_map = {
     'bread': Bread,
-    'bagel': Bagel
+    'bagel': Bagel,
+    'tomato': Tomato,
+    'cucumber': Cucumber,
 }
 def init_from_name(name):
     return name_map[name]()
