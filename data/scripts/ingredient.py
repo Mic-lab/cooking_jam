@@ -108,7 +108,7 @@ class Ingredient(Entity):
 
 class Bread(Ingredient):
     def __init__(self):
-        description = '''+ 10 points if another bread is on the same line.'''
+        description = '''+ 15 if another bread is on the same line.'''
         super().__init__(name='bread', description=description)
         
     def calculate_points(self, grid):
@@ -116,22 +116,22 @@ class Bread(Ingredient):
         for row in range(grid.size[1]):
             if self.grid_pos == (self.grid_pos[0], row): continue
             if isinstance(grid.data[row][self.grid_pos[0]], Bread):
-                points += 10
+                points += 15
         for col in range(grid.size[0]):
             if self.grid_pos == (col, self.grid_pos[1]): continue
             if isinstance(grid.data[self.grid_pos[1]][col], Bread):
-                points += 10
+                points += 15
         return points
 
 class Bagel(Ingredient):
     def __init__(self):
-        description = '''+5 points for every ingredient in between bagels'''
+        description = '''+10 for every ingredient in between bagels'''
         super().__init__(name='bagel', description=description, group=True)
 
     def calc_func(self, grid):
         score = 0
-        first = False
         for row in grid:
+            first = False
             added_score = 0
             for cell in row:
                 if cell is None: continue
@@ -142,7 +142,7 @@ class Bagel(Ingredient):
                     score += added_score
                     added_score = 0
                 else:
-                    added_score += 5
+                    added_score += 10
         return score
         
     def calculate_points(self, grid):
@@ -154,13 +154,31 @@ class Bagel(Ingredient):
 
 class Tomato(Ingredient):
     def __init__(self):
-        description = '''.'''
+        description = '''+5 for every Cucumber directly on top or bottom'''
         super().__init__(name='tomato', description=description)
+
+    def calculate_points(self, grid):
+        score = 0
+        top = grid.fetch_data(self.grid_pos + Vec2(0, -1))
+        bottom = grid.fetch_data(self.grid_pos + Vec2(0, 1))
+        for item in (top, bottom):
+            if isinstance(item, Cucumber):
+                score += 5
+        return score
 
 class Cucumber(Ingredient):
     def __init__(self):
-        description = '''.'''
+        description = '''+5 for every Tomato directly on left or right'''
         super().__init__(name='cucumber', description=description)
+
+    def calculate_points(self, grid):
+        score = 0
+        top = grid.fetch_data(self.grid_pos + Vec2(1, 0))
+        bottom = grid.fetch_data(self.grid_pos + Vec2(-1, 0))
+        for item in (top, bottom):
+            if isinstance(item, Tomato):
+                score += 5
+        return score
 
 name_map = {
     'bread': Bread,

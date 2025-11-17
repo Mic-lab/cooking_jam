@@ -26,9 +26,39 @@ class Customer(Entity):
             'points': 25,
         },
         {
-            'want': ((2, ingredient.Cucumber()), (2, ingredient.Tomato()), ),
+            'want': (),
             'points': 30,
         },
+        {
+            'want': (),
+            'points': 65,
+        },
+
+        {
+            'want': (),
+            'points': 125,
+        },
+
+
+
+
+        {
+            'want': (),
+            'points': -1,
+        },
+        {
+            'want': (),
+            'points': -1,
+        },
+
+        {
+            'want': (),
+            'points': -1,
+        },
+
+
+
+
     )
         
     DIALOGUES = (
@@ -36,8 +66,22 @@ class Customer(Entity):
          'Exactly as I asked for; thanks!'),
         ('Bob', 'Hi, I\'d like a sandwhich bagel (not be confused with a bagel sandwhich)',
          'Oh yeah, that\'s the stuff'),
-        ('Bob', 'Salad',
-         'Oh yeah, that\'s the stuff'),
+        ('Bob', 'I\'m feeling a bit spicy today. I\'ll have vegetable bagel.',
+         'It\'s overflowing... but that\'s ok'),
+        ('Bob', 'Place holder',
+         'Thanks'),
+        ('Bob', 'Place holder',
+         'Thanks'),
+        ('Bob', 'Place holder',
+         'Thanks'),
+        ('Bob', 'Place holder',
+         'Thanks'),
+        ('Bob', 'Place holder',
+         'Thanks'),
+        ('Bob', 'Place holder',
+         'Thanks'),
+        ('Bob', 'Place holder',
+         'Thanks'),
     )
 
     def __init__(self, *args, **kwargs):
@@ -133,6 +177,10 @@ class Game(State):
         self.lvl_start_timer = Timer(60, done=True)
         self.lvl_end_timer = Timer(120, done=True)
         self.stall_timer = Timer(30, done=True)
+
+        self.lvl_start_timer = Timer(5, done=True)
+        self.lvl_end_timer = Timer(5, done=True)
+
         if self.lvl == 0:
             self.start_level()
         else:

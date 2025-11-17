@@ -14,6 +14,7 @@ class Grid:
     PAN = Vec2(1, 1)
     CELL_SIZE = 24
     CENTER_POS = Vec2(415, 110)
+    CENTER_POS = Vec2(415, 130)
 
     cell_img = Animation.img_db['cell']
 
@@ -25,6 +26,12 @@ class Grid:
         self.pos = Grid.CENTER_POS - 0.5*Vec2(self.bg_surf.get_size())
         self.points = 0
         self.calc_ingredients(self.game.order)
+
+    def fetch_data(self, coord: Vec2):
+        try:
+            return self.data[int(coord[1])][int(coord[0])]
+        except IndexError:
+            return False
 
     def get_rect(self, col, row):
         return pygame.Rect(*(self.pos + 2*self.PAN + self.CELL_SIZE*Vec2(col, row)), self.CELL_SIZE, self.CELL_SIZE)
@@ -128,10 +135,7 @@ class Kitchen(State):
         (3, 3),
         (3, 3),
         (3, 4),
-        (3, 3),
-        (3, 3),
-        (3, 3),
-        (3, 3),
+        (4, 5),
         (3, 3),
         (3, 3),
         (3, 3),
@@ -139,9 +143,53 @@ class Kitchen(State):
     )
 
     INGREDIENTS = (
-        (ingredient.Bread(), ingredient.Bread()),
-        (ingredient.Bagel(), ingredient.Bagel()),
-        (ingredient.Tomato(), ingredient.Cucumber()),
+        (ingredient.Bread(),
+         ingredient.Bread()),
+
+        (ingredient.Bread(),
+         ingredient.Bread(),
+         ingredient.Bagel(),
+         ingredient.Bagel()),
+
+        (ingredient.Bagel(),
+         ingredient.Bagel(),
+         ingredient.Cucumber(),
+         ingredient.Cucumber(),
+         ingredient.Tomato(),
+         ingredient.Tomato()),
+
+        (ingredient.Bagel(),
+         ingredient.Bagel(),
+         ingredient.Bagel(),
+         ingredient.Cucumber(),
+         ingredient.Cucumber(),
+         ingredient.Tomato(),
+         ingredient.Tomato(),
+         ingredient.Tomato()),
+
+        (ingredient.Bread(),
+         ingredient.Bread(),
+         ingredient.Bread(),
+         ingredient.Cucumber(),
+         ingredient.Cucumber(),
+         ingredient.Cucumber(),
+         ingredient.Tomato(),
+         ingredient.Tomato(),
+         ingredient.Tomato()),
+
+        (ingredient.Bagel(),
+         ingredient.Bagel(),
+         ingredient.Bagel(),
+         ingredient.Bagel(),
+         ingredient.Bread(),
+         ingredient.Bread(),
+         ingredient.Bread(),
+         ingredient.Bread(),
+         ingredient.Cucumber(),
+         ingredient.Cucumber(),
+         ingredient.Tomato(),
+         ingredient.Tomato(),
+         ingredient.Tomato()),
 
     )
 
@@ -173,11 +221,12 @@ class Kitchen(State):
 
         # Generate ingredient data ---------------
         self.ingredient_dict = {}
-        for lvl in range(self.lvl + 1):
-            print(f'{lvl=} {self.INGREDIENTS=}')
-            for ing in self.INGREDIENTS[lvl]:
-                name = ing.name
-                self.ingredient_dict[name] = self.ingredient_dict.get(name, 0) + 1
+
+        # for lvl in range(self.lvl + 1):
+        lvl = self.lvl
+        for ing in self.INGREDIENTS[lvl]:
+            name = ing.name
+            self.ingredient_dict[name] = self.ingredient_dict.get(name, 0) + 1
 
         self.ingredients = []
         for row, (ingredient_name, quantity) in enumerate(self.ingredient_dict.items()):
