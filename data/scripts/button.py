@@ -13,6 +13,11 @@ class Button:
                        'fill': COLORS['black2'], 
                        'text': COLORS['white2'] }
         },
+        'white': {
+            'colors': {'border': COLORS['blue2'], 
+                       'fill': COLORS['white2'], 
+                       'text': COLORS['black2'] }
+        },
     }
     
     def __init__(self, rect: pygame.Rect, text, preset):

@@ -17,19 +17,21 @@ class Grid:
 
     cell_img = Animation.img_db['cell']
 
-    def __init__(self, size):
+    def __init__(self, size, game):
+        self.game = game
         self.size = size
         self.data = [[None]*size[0] for _ in range(size[1])]
         self.gen_img()
         self.pos = Grid.CENTER_POS - 0.5*Vec2(self.bg_surf.get_size())
         self.points = 0
+        self.calc_ingredients(self.game.order)
 
     def get_rect(self, col, row):
         return pygame.Rect(*(self.pos + 2*self.PAN + self.CELL_SIZE*Vec2(col, row)), self.CELL_SIZE, self.CELL_SIZE)
 
     def add_ingredient(self, ingredient, col, row):
         self.data[row][col] = ingredient
-        self.calculate_points()
+        self.update_stuff()
 
     def remove_ingredient(self, ingredient):
         if ingredient.grid_pos is None:
@@ -38,7 +40,7 @@ class Grid:
         col, row = ingredient.grid_pos
         self.data[row][col] = None
         ingredient.grid_pos = None
-        self.calculate_points()
+        self.update_stuff()
     
     def gen_img(self):
         surf = pygame.Surface(self.CELL_SIZE * Vec2(self.size) + 4*self.PAN)  # idk didnt think about the pan too much
@@ -48,6 +50,11 @@ class Grid:
                 pos = self.CELL_SIZE * Vec2(col, row) + self.PAN
                 surf.blit(self.cell_img, pos)
         self.bg_surf = surf
+
+    def update_stuff(self):
+        order = self.game.order
+        self.calculate_points()
+        self.calc_ingredients(order)
 
     def calculate_points(self):
         print('Calculating points')
@@ -68,9 +75,49 @@ class Grid:
                     else:
                         ing.set_points(ing.calculate_points(self))
                     points += ing.points
-
         self.points = points
-        print(f'{points=}')
+
+    FONT_H = 12
+
+    def calc_ingredients(self, order):
+        ing_dict = {}
+        for row in self.data:
+            for item in row:
+                if item is None:
+                    continue
+                ing_dict[item.name] = ing_dict.get(item.name, 0) + 1
+
+
+        ing_list =  []
+        for k, v in ing_dict.items():
+            ing_list.append((v, ingredient.init_from_name(k)))
+
+        used_ingredients = []
+        print('-'*90)
+        for ing in order['want']:
+            print(f'{ing=} in {ing_list=} ?')
+            inside = False
+            for q, i in ing_list:
+                print(f'{q=} {ing[0]=} {i} {ing[1]}')
+                if q >= ing[0] and i.name == ing[1].name:
+                    print('YESSIR')
+                    inside = True
+                    break
+            used_ingredients.append(inside)
+
+        self.used_ingredients_surf = pygame.Surface((10, self.FONT_H*len(used_ingredients)))
+        self.used_ingredients_surf.set_colorkey((0, 0, 0))
+        for i, ing in enumerate(used_ingredients):
+            print(f'{ing=}')
+            if ing:
+                s_name = 'check'
+            else:
+                s_name = 'x'
+            surf = Animation.img_db[s_name]
+            self.used_ingredients_surf.blit(surf, i*Vec2(0, self.FONT_H))
+
+        self.used_ingredients = used_ingredients
+
 
     def render(self, surf):
         surf.blit(self.bg_surf, self.pos)
@@ -93,7 +140,7 @@ class Kitchen(State):
 
     INGREDIENTS = (
         (ingredient.Bread(), ingredient.Bread()),
-        (ingredient.Bagel(), ingredient.Bagel())
+        (ingredient.Bagel(), ingredient.Bagel(), ingredient.Bagel())
 
     )
 
@@ -116,7 +163,7 @@ class Kitchen(State):
         self.win_timer = Timer(20)
         self.points = 0
         self.generate_point_surf()
-        self.grid = Grid(self.GRID_SIZES[self.lvl])
+        self.grid = Grid(self.GRID_SIZES[self.lvl], self)
 
         self.selected_ingredient = None
         self.saved_hovered_ingredient = None
@@ -148,6 +195,7 @@ class Kitchen(State):
         canvas = self.handler.canvas
         self.handler.canvas.blit(self.bg)
         canvas.blit(self.order_img, (10, 50))
+        canvas.blit(self.grid.used_ingredients_surf, Vec2(10, 50) + (80, 2))
 
         self.grid.render(canvas)
 
@@ -195,9 +243,9 @@ class Kitchen(State):
         
         if self.points != self.grid.points:
             self.points = self.grid.points
-            self.win = self.points >= self.needed_points
+            self.win = self.points >= self.needed_points and (False not in self.grid.used_ingredients)
             if self.win:
-                self.buttons['back'] = Button(self.btn_rect, 'Finish', 'basic')
+                self.buttons['back'] = Button(self.btn_rect, 'Finish', 'white')
             self.generate_point_surf()
         canvas.blit(self.point_surf, (408, 34))
 
