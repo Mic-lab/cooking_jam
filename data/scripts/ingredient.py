@@ -118,6 +118,35 @@ class Bread(Ingredient):
                 points += 10
         return points
 
+class Bagel(Ingredient):
+    def __init__(self):
+        description = '''+5 points for every ingredient in between 2 pagels'''
+        super().__init__(name='Bagel', description=description)
+        
+    def calculate_points(self, grid):
+        points = 0
+
+        x_points_1 = 0
+        x_points_2 = 0
+        passed_self = False
+        for row in range(grid.size[1]):
+            if self.grid_pos == (col, self.grid_pos[1]):
+                passed_self = True
+                continue
+            item = grid.data[row][self.grid_pos[0]]
+            if item is None: continue
+            if not isinstance(item, Bagel):
+                if not passed_self:
+                    x_points_1 += 5
+                else:
+                    x_points_2 += 5
+            if self.grid_pos == (self.grid_pos[0], row): continue
+        for col in range(grid.size[0]):
+            if self.grid_pos == (col, self.grid_pos[1]): continue
+            if isinstance(grid.data[self.grid_pos[1]][col], Bread):
+                points += 10
+        return points
+
 name_map = {
     'bread': Bread
 }

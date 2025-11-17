@@ -199,6 +199,7 @@ class Kitchen(State):
             if btn.clicked:
                 if key == 'back':
                     self.handler.transition_to(self.handler.states.Game)
+                    self.handler.lvl += 1
 
     def generate_point_surf(self):
         color = COLORS['blue1'] if self.win else COLORS['red2']

@@ -24,7 +24,9 @@ class Customer(Entity):
     )
         
     DIALOGUES = (
-        ('kid', 'Hello. May I please have a sandwhich, but without the filling'),
+        ('John Smith', 'Hello. May I please have a sandwhich, but without the filling',
+         'Exactly as I asked for; thanks!'),
+        ('Bob', 'Hi, I\'d like a tomato bagel'),
     )
 
     def __init__(self, *args, **kwargs):
@@ -101,12 +103,17 @@ class Game(State):
         }
 
         self.bg = Animation.img_db['bg']
-        self.lvl = 0
+        self.lvl = self.handler.lvl
         self.start_level()
+
+    def end_level(self):
+        pass
 
     def start_level(self):
         self.lvl_start_timer = Timer(duration=30)
-        self.customer = Customer(pos=(0, 0), name=f'customer_{self.lvl}', action='idle')
+        name = f'customer_{self.lvl}'
+        name = 'customer_0'
+        self.customer = Customer(pos=(0, 0), name=name, action='idle')
         self.customer.real_pos = [CANVAS_SIZE[0] * 0.5 - self.customer.img.get_width() * 0.5, CANVAS_SIZE[1]-self.customer.rect.h]
         self.START_POS = self.customer.real_pos.copy()
 
