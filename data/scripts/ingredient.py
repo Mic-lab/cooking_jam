@@ -180,11 +180,28 @@ class Cucumber(Ingredient):
                 score += 5
         return score
 
+class Chicken(Ingredient):
+    def __init__(self):
+        description = '''+5 for every diagonal and adjacent ingredient'''
+        super().__init__(name='chicken', description=description)
+
+    def calculate_points(self, grid):
+        score = 0
+        for i in range(-1, 2):
+            for j in range(-1, 2):
+                if (i, j) == (0, 0): continue
+                pos = self.grid_pos + Vec2(i, j)
+                item = grid.fetch_data(pos)
+                if item is not None:
+                    score += 5
+        return score
+
 name_map = {
     'bread': Bread,
     'bagel': Bagel,
     'tomato': Tomato,
     'cucumber': Cucumber,
+    'chicken': Chicken,
 }
 def init_from_name(name):
     return name_map[name]()

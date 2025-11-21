@@ -1,6 +1,7 @@
 from . import utils
 import pygame
 import os
+from .config import COLORS
 
 pygame.init()
 
@@ -22,5 +23,5 @@ class Font:
 
 FONTS = {
     'regular': Font('ProggyClean', 16, (240, 240, 240)),
-    'basic': Font('Minecraftia', 8, (240, 240, 240)),
+    'basic': Font('Minecraftia', 8, COLORS['white2']),
 }

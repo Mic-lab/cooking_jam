@@ -31,13 +31,13 @@ class Customer(Entity):
         },
         {
             'want': (),
+            'points': 125,
+        },
+        {
+            'want': (),
             'points': 65,
         },
 
-        {
-            'want': (),
-            'points': 125,
-        },
 
 
 
@@ -84,7 +84,7 @@ class Customer(Entity):
          'Thanks'),
     )
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, username, *args, **kwargs):
         name = kwargs['name']
         n = int(name[-1])
         kwargs['name'] = 'customer_0'
@@ -94,6 +94,13 @@ class Customer(Entity):
         self.dialogue_img = self.get_dialogue_img()
         self.dialogue_img_2 = self.get_dialogue_img_2()
         self.showing_dialogue = False
+
+        self.username = username
+
+        name_surf = FONTS['basic'].get_surf(f'{self.username}\'s #1 customer', COLORS['white2'])
+        self.name_surf = pygame.Surface(name_surf.get_size(), pygame.SRCALPHA)
+        self.name_surf.fill((0, 0, 0, 100))
+        self.name_surf.blit(name_surf)
 
     def get_dialogue_img(self):
         # s.fill((80, 80, 150))
@@ -158,13 +165,19 @@ class Customer(Entity):
             )
             dialogue_pos = (CANVAS_SIZE[0] - 200, CANVAS_SIZE[1]*0.5 - 30)
             surf.blit(dialogue_img, dialogue_pos)
-        return super().render(surf)
+
+        super().render(surf)
+        surf.blit(self.name_surf,
+                  (self.rect.centerx - self.name_surf.get_width()*0.5,
+                   self.rect.top - 12))
 
 
 class Game(State):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+
+        self.username = self.handler.name
 
         w, h = 100, 20
         self.btn_rect_center = pygame.Rect(CANVAS_SIZE[0]*0.5 - w * 0.5, 20, w, h)
@@ -197,7 +210,7 @@ class Game(State):
         self.leaving = True
         self.lvl_end_timer.reset()
         name = f'customer_{self.lvl - 1}'
-        self.customer = Customer(pos=(0, 0), name=name, action='idle')
+        self.customer = Customer(username=self.username, pos=(0, 0), name=name, action='idle')
         self.customer.real_pos = self.get_start_pos()
         self.customer.real_pos[1] = self.get_end_pos_y()
         self.start_pos = self.customer.real_pos.copy()
@@ -208,7 +221,7 @@ class Game(State):
         self.leaving = False
         self.lvl_start_timer.reset()
         name = f'customer_{self.lvl}'
-        self.customer = Customer(pos=(0, 0), name=name, action='idle')
+        self.customer = Customer(username=self.username, pos=(0, 0), name=name, action='idle')
         self.customer.real_pos = self.get_start_pos()
         self.start_pos = self.customer.real_pos.copy()
 

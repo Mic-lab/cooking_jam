@@ -11,6 +11,45 @@ from .. import sfx
 from .. import screen, config
 import pygame
 
+class TextBox:
+
+    ACCEPTED_KEYS = set('1234567890qwertyuiopasdfghjklzxcvbnm') | {'space'}
+
+    def __init__(self, pos, text='', max_size=16):
+        self.pos = pos
+        self.text = text
+        self.max_size = max_size
+
+    def update(self, inputs):
+        if inputs['pressed'].get('backspace'):
+            self.text = self.text[:-1]
+
+        if len(self.text) <= self.max_size:
+            for key, pressed in inputs['pressed'].items():
+                if pressed and key in TextBox.ACCEPTED_KEYS:
+                    if key == 'space': key = ' '
+                    elif inputs['held'].get('left shift'): key = key.upper()
+                    self.text += key
+                    break  # NOTE: cant press multiple keys in the same frame
+
+    def update_surf(self):
+        font_surf = FONTS['basic'].get_surf(self.text, color=config.COLORS['blue4'])
+        self.surf = pygame.Surface(font_surf.get_size(), pygame.SRCALPHA)
+        # self.surf.fill((0, 0, 0, 100))
+        self.surf.blit(font_surf)
+
+    def render(self, surf):
+        surf.blit(self.surf, self.pos)
+
+    @property
+    def text(self):
+        return self._text
+
+    @text.setter
+    def text(self, new_text):
+        self._text = new_text
+        self.update_surf()
+
 class Menu(State):
 
     def __init__(self, *args, **kwargs):
@@ -21,29 +60,18 @@ class Menu(State):
             'game': Button(rects[0], 'harloo', 'basic'),
             'scale': Button(rects[1], f'Window Scale ({config.scale}x)', 'basic'),
         }
-        self.surf = Entity((0, 0), 'test')
-        self.entity = PhysicsEntity(pos=(150, 30), name='side', action='idle')
-        self.e_speed = 1.5
-        self.timer = None
+        self.name_surf = FONTS['basic'].get_surf('Enter your name > ')
+        self.text_box = TextBox((300, 30))
         self.particle_gens = [ParticleGenerator.from_template((200, 200), 'angle test'),
                               ParticleGenerator.from_template((300, 200), 'color test')]
+        self.particle_gens = []
 
     def sub_update(self):
+        self.handler.canvas.fill(config.COLORS['black1'])
+        self.handler.canvas.blit(self.name_surf, (200, 30))
+        self.text_box.update(self.handler.inputs)
+        self.text_box.render(self.handler.canvas)
 
-        if self.timer:
-            if self.timer.done:
-                self.timer = None
-            else:
-                self.timer.update()
-
-        if self.handler.inputs['pressed'].get('mouse3'):
-            self.timer = Timer(60)
-
-        self.handler.canvas.fill((20, 20, 20))
-
-        self.surf.real_pos = self.handler.inputs['mouse pos']
-        self.surf.render(self.handler.canvas)
-        # self.handler.canvas.blit(self.surf, self.handler.inputs['mouse pos'])
 
         if self.handler.inputs['pressed'].get('mouse1'):
             self.particle_gens.append(ParticleGenerator.from_template(self.handler.inputs['mouse pos'], 'smoke'))
@@ -61,6 +89,7 @@ class Menu(State):
 
             if btn.clicked:
                 if key == 'game':
+                    self.handler.name = self.text_box.text
                     self.handler.transition_to(self.handler.states.Game)
                 elif key == 'music 1':
                     sfx.play_music('song_1.wav', -1)
@@ -77,31 +106,8 @@ class Menu(State):
                     btn.text = f'Window Scale ({config.scale}x)'
                     shader_handler.vars['scale'] = config.scale
 
-        self.entity.vel = [0, 0]
-        if self.handler.inputs['held'].get('a'):
-            self.entity.vel[0] -= self.e_speed
-            self.entity.animation.flip[0] = True
-        elif self.handler.inputs['held'].get('d'):
-            self.entity.vel[0] += self.e_speed
-            self.entity.animation.flip[0] = False
-        if self.handler.inputs['held'].get('w'):
-            self.entity.vel[1] -= self.e_speed
-        elif self.handler.inputs['held'].get('s'):
-            self.entity.vel[1] += self.e_speed
-
-        if any(self.entity.vel):
-            self.entity.animation.set_action('run')
-        else:
-            self.entity.animation.set_action('idle')
-
-        self.entity.update([btn.rect for btn in self.buttons.values()])
-        self.entity.render(self.handler.canvas)
-
         text = [f'{round(self.handler.clock.get_fps())} fps',
-                f'vel = {self.entity.vel}',
-                # pprint.pformat(Particle.cache)
                 ]
         self.handler.canvas.blit(FONTS['basic'].get_surf('\n'.join(text)), (0, 0))
 
-        # shader_handler.vars['shakeTimer'] = -1 if not self.timer else self.timer.ratio ** 2
-        shader_handler.vars['caTimer'] = -1 if not self.timer else self.timer.ratio ** 2
+        shader_handler.vars['caTimer'] = -1

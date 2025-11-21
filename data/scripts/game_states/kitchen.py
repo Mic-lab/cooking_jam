@@ -29,6 +29,7 @@ class Grid:
 
     def fetch_data(self, coord: Vec2):
         try:
+            if coord[0] < 0 or coord[1] < 0: raise IndexError
             return self.data[int(coord[1])][int(coord[0])]
         except IndexError:
             return False
@@ -158,15 +159,6 @@ class Kitchen(State):
          ingredient.Tomato(),
          ingredient.Tomato()),
 
-        (ingredient.Bagel(),
-         ingredient.Bagel(),
-         ingredient.Bagel(),
-         ingredient.Cucumber(),
-         ingredient.Cucumber(),
-         ingredient.Tomato(),
-         ingredient.Tomato(),
-         ingredient.Tomato()),
-
         (ingredient.Bread(),
          ingredient.Bread(),
          ingredient.Bread(),
@@ -180,6 +172,29 @@ class Kitchen(State):
         (ingredient.Bagel(),
          ingredient.Bagel(),
          ingredient.Bagel(),
+         ingredient.Cucumber(),
+         ingredient.Cucumber(),
+         ingredient.Tomato(),
+         ingredient.Tomato(),
+         ingredient.Tomato()),
+
+        (ingredient.Cucumber(),
+         ingredient.Cucumber(),
+         ingredient.Tomato(),
+         ingredient.Chicken()),
+
+        (ingredient.Cucumber(),
+         ingredient.Cucumber(),
+         ingredient.Tomato(),
+         ingredient.Chicken()),
+
+
+        (ingredient.Bagel(),
+         ingredient.Bagel(),
+         ingredient.Bagel(),
+         ingredient.Chicken(),
+         ingredient.Chicken(),
+         ingredient.Chicken(),
          ingredient.Bagel(),
          ingredient.Bread(),
          ingredient.Bread(),

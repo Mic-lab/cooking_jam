@@ -1,12 +1,21 @@
 { "frames": [
    {
     "filename": "idle",
-    "frame": { "x": 0, "y": 0, "w": 37, "h": 71 },
+    "frame": { "x": 0, "y": 0, "w": 40, "h": 79 },
     "rotated": false,
     "trimmed": true,
-    "spriteSourceSize": { "x": 45, "y": 36, "w": 37, "h": 71 },
+    "spriteSourceSize": { "x": 38, "y": 19, "w": 40, "h": 79 },
     "sourceSize": { "w": 128, "h": 128 },
-    "duration": 100
+    "duration": 500
+   },
+   {
+    "filename": "idle",
+    "frame": { "x": 40, "y": 0, "w": 40, "h": 79 },
+    "rotated": false,
+    "trimmed": true,
+    "spriteSourceSize": { "x": 38, "y": 19, "w": 40, "h": 79 },
+    "sourceSize": { "w": 128, "h": 128 },
+    "duration": 500
    }
  ],
  "meta": {
@@ -14,7 +23,7 @@
   "version": "1.x-dev",
   "image": "customer_0.png",
   "format": "RGBA8888",
-  "size": { "w": 37, "h": 71 },
+  "size": { "w": 80, "h": 79 },
   "scale": "1",
   "slices": [
   ]
