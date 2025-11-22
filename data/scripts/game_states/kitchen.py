@@ -14,7 +14,7 @@ class Grid:
     PAN = Vec2(1, 1)
     CELL_SIZE = 24
     CENTER_POS = Vec2(415, 110)
-    CENTER_POS = Vec2(415, 130)
+    CENTER_POS = Vec2(423, 100)
 
     cell_img = Animation.img_db['cell']
 
@@ -26,6 +26,7 @@ class Grid:
         self.pos = Grid.CENTER_POS - 0.5*Vec2(self.bg_surf.get_size())
         self.points = 0
         self.calc_ingredients(self.game.order)
+        self.update_score = False
 
     def fetch_data(self, coord: Vec2):
         try:
@@ -61,6 +62,7 @@ class Grid:
 
     def update_stuff(self):
         order = self.game.order
+        self.update_score = True
         self.calculate_points()
         self.calc_ingredients(order)
 
@@ -132,17 +134,21 @@ class Grid:
 
 class Kitchen(State):
 
+    SCORE_POS = Vec2(400, 50)
+    SCORE_POS = Vec2(400, 170)
+
     GRID_SIZES = (
         (3, 3),
         (3, 3),
         (3, 4),
+        (3, 3),
         (4, 5),
         (3, 3),
-        (3, 3),
-        (3, 3),
-        (3, 3),
+        (4, 3),
+        (5, 5),
     )
 
+    # shouldve prolly used strings but im in too deep now
     INGREDIENTS = (
         (ingredient.Bread(),
          ingredient.Bread()),
@@ -186,7 +192,14 @@ class Kitchen(State):
         (ingredient.Cucumber(),
          ingredient.Cucumber(),
          ingredient.Tomato(),
-         ingredient.Chicken()),
+         ingredient.Tomato(),
+         ingredient.Tomato(),
+         ingredient.Chicken(),
+         ingredient.Bread(),
+         ingredient.Bread(),
+         ingredient.Bagel(),
+         ingredient.Bagel(),
+         ),
 
 
         (ingredient.Bagel(),
@@ -215,7 +228,7 @@ class Kitchen(State):
         self.bg = Animation.img_db['kitchen_bg']
        
         rects = [pygame.Rect(300, 150+i*30, 80, 20) for i in range(4)]
-        self.btn_rect = pygame.Rect(400, 200, 80, 20)
+        self.btn_rect = pygame.Rect(self.SCORE_POS.x, self.SCORE_POS.y+35, 80, 20)
         self.buttons = {
         }
         self.lvl = self.handler.lvl
@@ -306,13 +319,15 @@ class Kitchen(State):
             )
 
         
-        if self.points != self.grid.points:
+        if self.grid.update_score:
+            self.grid.update_score = False
             self.points = self.grid.points
             self.win = self.points >= self.needed_points and (False not in self.grid.used_ingredients)
             if self.win:
                 self.buttons['back'] = Button(self.btn_rect, 'Finish', 'white')
             self.generate_point_surf()
-        canvas.blit(self.point_surf, (408, 34))
+        # canvas.blit(self.point_surf, (408, 34))
+        canvas.blit(self.point_surf, self.SCORE_POS)
 
         alpha = self.win_timer.ratio * 255
         if self.win:
@@ -338,6 +353,11 @@ class Kitchen(State):
                     self.handler.lvl += 1
 
     def generate_point_surf(self):
-        color = COLORS['blue1'] if self.win else COLORS['red2']
-        surf = FONTS['basic'].get_surf(f'Score : {self.points} / {self.needed_points}', color)
+        color = COLORS['blue4'] if self.win else COLORS['white2']
+        surf_1 = FONTS['basic'].get_surf('Score', COLORS['white2'])
+        surf_2 = FONTS['big'].get_surf(f'{self.points}/{self.needed_points}', color)
+        surf = pygame.Surface((surf_2.get_width(), surf_1.get_height() + surf_2.get_height()))
+        surf.set_colorkey((0, 0, 0))
+        surf.blit(surf_1, (0, 0))
+        surf.blit(surf_2, (0, surf_1.get_height()))
         self.point_surf = surf

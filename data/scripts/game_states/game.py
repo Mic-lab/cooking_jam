@@ -23,32 +23,34 @@ class Customer(Entity):
         },
         {
             'want': ((2, ingredient.Bread()), (2, ingredient.Bagel()), ),
-            'points': 25,
+            'points': 40,
         },
         {
-            'want': (),
-            'points': 30,
+            'want': ((2, ingredient.Bagel()),
+                     (2, ingredient.Tomato()),
+                     (2, ingredient.Cucumber())),
+            'points': 40,
         },
         {
             'want': (),
             'points': 125,
         },
         {
-            'want': (),
+            'want': ((3, ingredient.Bagel()), ),
             'points': 65,
         },
 
-
-
-
-
         {
-            'want': (),
-            'points': -1,
+            'want': ((1, ingredient.Chicken()), ),
+            'points': 25,
         },
         {
-            'want': (),
-            'points': -1,
+            'want': (
+                (2, ingredient.Bagel()),
+                (2, ingredient.Bread()),
+                (1, ingredient.Chicken()),
+            ),
+            'points': 110,
         },
 
         {
@@ -62,19 +64,21 @@ class Customer(Entity):
     )
         
     DIALOGUES = (
-        ('John Smith', 'Hello. May I please have a sandwhich, but without the filling',
-         'Exactly as I asked for; thanks!'),
+        ('John Smith', 'Hello. May I please have a sandwhich, but without the filling?',
+         'Exactly as I asked for. Thanks!'),
         ('Bob', 'Hi, I\'d like a sandwhich bagel (not be confused with a bagel sandwhich)',
          'Oh yeah, that\'s the stuff'),
         ('Bob', 'I\'m feeling a bit spicy today. I\'ll have vegetable bagel.',
          'It\'s overflowing... but that\'s ok'),
-        ('Bob', 'Place holder',
-         'Thanks'),
-        ('Bob', 'Place holder',
-         'Thanks'),
-        ('Bob', 'Place holder',
-         'Thanks'),
-        ('Bob', 'Place holder',
+        ('Bob', 'Surprise me.',
+         'Alternating the tomato\'s and cucumbers I see. I like it.'),
+        ('Bob', 'I\'ll have a Double Triple Bossy Deluxe on a raft, 4x4 animal style, extra shingles with a shimmy and a squeeze, light axle grease, make it cry, burn it, and let it swim',
+         'Acceptable.'),
+        ('Bob', 'I\'ll try a caesar salad now',
+         'Thanks.'),
+        ('Bob', 'Since when did you have chicken? Ok then I\'ll take a chicken bagel sandwhich.',
+         'Wow. Beautiful assortment.'),
+        ('Bob', 'That\'s all i have for the game as of now',
          'Thanks'),
         ('Bob', 'Place holder',
          'Thanks'),
@@ -169,7 +173,7 @@ class Customer(Entity):
         super().render(surf)
         surf.blit(self.name_surf,
                   (self.rect.centerx - self.name_surf.get_width()*0.5,
-                   self.rect.top - 12))
+                   self.rect.top - 14))
 
 
 class Game(State):

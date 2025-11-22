@@ -89,8 +89,12 @@ class Menu(State):
 
             if btn.clicked:
                 if key == 'game':
-                    self.handler.name = self.text_box.text
+                    name = self.text_box.text.strip()
+                    if not name: name = 'Bob'
+                    self.handler.name = name
                     self.handler.transition_to(self.handler.states.Game)
+                    pygame.mixer.music.set_volume(0.3)
+                    sfx.play_music('song_1.wav', )
                 elif key == 'music 1':
                     sfx.play_music('song_1.wav', -1)
                 elif key == 'music 2':

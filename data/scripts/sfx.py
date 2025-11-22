@@ -1,7 +1,9 @@
 import os
 import pygame
 
-pygame.mixer.init()
+pygame.mixer.init(
+    frequency=10000 #low quality
+)
 
 SOUNDS_DIR = os.path.join('data/sfx/sounds')
 MUSIC_DIR = os.path.join('data/sfx/music')

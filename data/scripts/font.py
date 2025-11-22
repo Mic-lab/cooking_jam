@@ -24,4 +24,5 @@ class Font:
 FONTS = {
     'regular': Font('ProggyClean', 16, (240, 240, 240)),
     'basic': Font('Minecraftia', 8, COLORS['white2']),
+    'big': Font('VCR_OSD_MONO_1.001', 21, COLORS['white2'])
 }
