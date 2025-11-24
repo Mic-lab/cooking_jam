@@ -9,6 +9,7 @@ from ..font import FONTS
 from ..config import COLORS
 from ..timer import Timer
 from .. import sfx
+from ..mgl import shader_handler
 
 class Grid:
 
@@ -185,6 +186,13 @@ class Grid:
 
     def render(self, surf):
         surf.blit(self.bg_surf, self.pos)
+        # for i, row in enumerate(self.data):
+        #     for j, ing in enumerate(row):
+        #         if ing:
+        #             rect = self.get_rect(j, i)
+        #             surf.blit(
+        #                 Animation.img_db['fill'], rect.topleft - Vec2(0, 0)
+        #             )
         for tile in self.flashed_tiles:
             rect = tile['rect']
             s = pygame.Surface(rect.size)
@@ -288,6 +296,7 @@ class Kitchen(State):
 
         super().__init__(*args, **kwargs)
         self.bg = Animation.img_db['kitchen_bg']
+        self.ca_timer = Timer(10, done=True)
        
         rects = [pygame.Rect(300, 150+i*30, 80, 20) for i in range(4)]
         self.btn_rect = pygame.Rect(self.SCORE_POS.x, self.SCORE_POS.y+35, 80, 20)
@@ -388,6 +397,8 @@ class Kitchen(State):
             self.win = self.points >= self.needed_points and (False not in self.grid.used_ingredients)
             if self.win:
                 self.buttons['back'] = Button(self.btn_rect, 'Finish', 'white')
+                self.ca_timer.reset()
+                sfx.sounds['win.wav'].play()
             self.generate_point_surf()
         # canvas.blit(self.point_surf, (408, 34))
         canvas.blit(self.point_surf, self.SCORE_POS)
@@ -405,6 +416,8 @@ class Kitchen(State):
                 if 'back' in self.buttons:
                     del self.buttons['back']
 
+        self.ca_timer.update()
+
         # Update Buttons
         for key, btn in self.buttons.items():
             btn.update(self.handler.inputs)
@@ -414,6 +427,9 @@ class Kitchen(State):
                 if key == 'back':
                     self.handler.transition_to(self.handler.states.Game)
                     self.handler.lvl += 1
+
+
+        shader_handler.vars['caTimer'] = self.ca_timer.ratio ** 2
 
     def generate_point_surf(self):
         color = COLORS['blue4'] if self.win else COLORS['white2']

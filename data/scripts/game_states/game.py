@@ -1,4 +1,5 @@
 import pygame
+from pygame import Vector2 as Vec2
 from .state import State
 # from .menu import Menu
 from ..button import Button
@@ -66,7 +67,7 @@ class Customer(Entity):
     DIALOGUES = (
         ('John Smith', 'Hello. May I please have a sandwhich, but without the filling?',
          'Exactly as I asked for. Thanks!'),
-        ('Bob', 'Hi, I\'d like a sandwhich bagel (not be confused with a bagel sandwhich)',
+        ('Bob', 'Hi, I\'d like a sandwhich bagel (not to be confused with a bagel sandwhich)',
          'Oh yeah, that\'s the stuff'),
         ('Bob', 'I\'m feeling a bit spicy today. I\'ll have vegetable bagel.',
          'It\'s overflowing... but that\'s ok'),
@@ -139,7 +140,7 @@ class Customer(Entity):
         font_surf_1 = FONTS['basic'].get_surf(txt_1, wraplength=150, color=COLORS['black1'])
 
         h = font_surf_1.get_height()
-        s = pygame.Surface((154, h))
+        s = pygame.Surface((154, h+4))
         s.fill(COLORS['white1'])
         s.blit(font_surf_1, (2, 2))
         return s
@@ -168,6 +169,7 @@ class Customer(Entity):
                 )
             )
             dialogue_pos = (CANVAS_SIZE[0] - 200, CANVAS_SIZE[1]*0.5 - 30)
+            dialogue_pos = (self.rect.topleft + Vec2(80, 0))
             surf.blit(dialogue_img, dialogue_pos)
 
         super().render(surf)
@@ -195,7 +197,7 @@ class Game(State):
         self.lvl = self.handler.lvl
         self.lvl_start_timer = Timer(60, done=True)
         self.lvl_end_timer = Timer(120, done=True)
-        self.stall_timer = Timer(30, done=True)
+        self.stall_timer = Timer(60, done=True)
 
         if config.DEBUG:
             self.lvl_start_timer = Timer(5, done=True)

@@ -52,6 +52,8 @@ class TextBox:
 
 class Menu(State):
 
+    NAME_POS = pygame.Vector2(292, 90)
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
@@ -61,14 +63,16 @@ class Menu(State):
             'scale': Button(rects[1], f'Window Scale ({config.scale}x)', 'basic'),
         }
         self.name_surf = FONTS['basic'].get_surf('Enter your name > ')
-        self.text_box = TextBox((300, 30))
+        self.text_box = TextBox(Menu.NAME_POS + (90, 0))
         self.particle_gens = [ParticleGenerator.from_template((200, 200), 'angle test'),
                               ParticleGenerator.from_template((300, 200), 'color test')]
         self.particle_gens = []
 
     def sub_update(self):
-        self.handler.canvas.fill(config.COLORS['black1'])
-        self.handler.canvas.blit(self.name_surf, (200, 30))
+        self.handler.canvas.blit(
+            animation.Animation.img_db['menu']
+        )
+        self.handler.canvas.blit(self.name_surf, Menu.NAME_POS)
         self.text_box.update(self.handler.inputs)
         self.text_box.render(self.handler.canvas)
 
@@ -113,5 +117,3 @@ class Menu(State):
         text = [f'{round(self.handler.clock.get_fps())} fps',
                 ]
         self.handler.canvas.blit(FONTS['basic'].get_surf('\n'.join(text)), (0, 0))
-
-        shader_handler.vars['caTimer'] = -1

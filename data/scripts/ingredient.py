@@ -2,8 +2,11 @@ from .entity import Entity
 from .config import COLORS
 from .font import FONTS
 from .animation import Animation
+from .sfx import sounds
 from pygame import Vector2 as Vec2
 import pygame
+from random import randint
+
 
 class Ingredient(Entity):
 
@@ -39,6 +42,7 @@ class Ingredient(Entity):
                     self.grid_pos = self.hovered_cell[0], self.hovered_cell[1]
                     grid.add_ingredient(self, self.hovered_cell[0], self.hovered_cell[1])
                     self.hovered_cell = None
+                    sounds[f'place_{randint(1, 4)}.wav'].play()
         elif inputs['pressed']['mouse1']:
             if self.rect.collidepoint(inputs['mouse pos']) and not selected_ingredient:
                 grid.remove_ingredient(self)

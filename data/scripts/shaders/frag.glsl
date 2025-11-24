@@ -4,7 +4,7 @@ uniform sampler2D canvasTex;
 uniform float transitionTimer;
 uniform int transitionState;
 uniform float shakeTimer = -1.0;
-uniform float caTimer = -1.0;
+uniform float caTimer = 1;
 uniform int scale;
 in vec2 uvs;
 out vec4 f_color;
@@ -42,8 +42,10 @@ void main() {
     }
 
     // Chromatic abberation
-    if (caTimer >= 0.0) {
+    // if (caTimer > 0.0) {
+    if (caTimer > -99) {
         float caIntensity = (1.0 - caTimer)*centerDist * caCoef;
+        caIntensity = 0.0007 + caIntensity;
         vec2 sampleVec = vec2(0.0, caIntensity);
         float caSample1 = texture(canvasTex, uvs + sampleVec).r;
         float caSample2 = texture(canvasTex, uvs - rotateVec(sampleVec, 2.0*PI/3.0)).g;
@@ -72,7 +74,7 @@ void main() {
 
     // CRT
     if (mod(pxCoord.y, scale) == 0) {
-        f_color.rgb = mix(f_color.rgb, vec3(0), 0.000000000001);
+        f_color.rgb = mix(f_color.rgb, vec3(0, 0, 0.3), 0.2);
         // f_color.rgb = vec3(0);
     }
 

@@ -1,7 +1,7 @@
 # https://pacoup.com/2011/06/12/list-of-true-169-resolutions/
 CANVAS_SIZE = (640, 360)
 CANVAS_SIZE = (512, 288)
-scale = 3
+scale = 2
 SCREEN_SIZE = scale*CANVAS_SIZE[0], scale*CANVAS_SIZE[1]
 COLORS = {
     'white1': (155, 171, 178),

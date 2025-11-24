@@ -20,10 +20,12 @@ def load_sounds():
     for file in os.listdir(SOUNDS_DIR):
         full_file = os.path.join(SOUNDS_DIR, file)
         sound = pygame.mixer.Sound(full_file)
-        if file == 'tile_flash.wav':
-            sound.set_volume(0.5)
+        if file == 'click.wav':
+            sound.set_volume(0.2)
+        elif file.startswith('place'):
+            sound.set_volume(0.7)
         else:
-            sound.set_volume(0.6)
+            sound.set_volume(0.3)
         print(sound)
         sounds[file] = sound
     return sounds
