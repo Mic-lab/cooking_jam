@@ -2,7 +2,7 @@ import os
 import pygame
 
 pygame.mixer.init(
-    frequency=10000 #low quality
+    frequency=10000  # low quality audio
 )
 
 SOUNDS_DIR = os.path.join('data/sfx/sounds')
@@ -24,6 +24,8 @@ def load_sounds():
             sound.set_volume(0.2)
         elif file.startswith('place'):
             sound.set_volume(0.7)
+        elif file == 'win.wav':
+            sound.set_volume(0.5)
         else:
             sound.set_volume(0.3)
         print(sound)

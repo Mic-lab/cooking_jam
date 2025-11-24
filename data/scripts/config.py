@@ -6,6 +6,7 @@ SCREEN_SIZE = scale*CANVAS_SIZE[0], scale*CANVAS_SIZE[1]
 COLORS = {
     'white1': (155, 171, 178),
     'white2': (199, 220, 208),
+    'super black': (18, 17, 19),
     'black1': (46, 34, 37),
     'black2': (62, 53, 70),
     'black3': (98, 85, 101),

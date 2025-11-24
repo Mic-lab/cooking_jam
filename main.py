@@ -1,12 +1,14 @@
 import sys
 import pygame
 from pygame import Vector2 as Vec2
+from data.scripts import sfx
 from data.scripts import config
 from data.scripts import utils
 from data.scripts.mgl import shader_handler
 from data.scripts import game_states
 from data.scripts.transition import Transition, TransitionState
 from data.scripts.animation import Animation
+
 
 pygame.mouse.set_visible(False)
 

@@ -3,12 +3,16 @@ from .config import COLORS
 from .font import FONTS
 from .animation import Animation
 from .sfx import sounds
+from .utils import swap_colors
 from pygame import Vector2 as Vec2
 import pygame
 from random import randint
 
 
 class Ingredient(Entity):
+
+    SHADOW_CACHE = {}
+    SHADOW_OFFSET = Vec2(1, 2)
 
     @staticmethod
     def get_order_img(order):
@@ -38,7 +42,7 @@ class Ingredient(Entity):
             self.selected = False
             if self.hovered_cell:
                 if self.hovered_cell[3]:
-                    self.real_pos = self.hovered_cell[2].center - 0.5*Vec2(self.rect.size)
+                    self.real_pos = self.hovered_cell[2].center - 0.5*Vec2(self.rect.size) + Vec2(1, 1)
                     self.grid_pos = self.hovered_cell[0], self.hovered_cell[1]
                     grid.add_ingredient(self, self.hovered_cell[0], self.hovered_cell[1])
                     self.hovered_cell = None
@@ -47,6 +51,7 @@ class Ingredient(Entity):
             if self.rect.collidepoint(inputs['mouse pos']) and not selected_ingredient:
                 grid.remove_ingredient(self)
                 self.selected = True
+                sounds['pickup.wav'].play()
 
         if self.selected:
             self.real_pos = inputs['mouse pos'] - Vec2(self.rect.size) * 0.5
@@ -61,8 +66,8 @@ class Ingredient(Entity):
                         break
 
         vel = self.real_pos - self.old_pos
-        self.angle += vel.x * 0.8
-        self.angle *= 0.6
+        self.angle += vel.x * 0.85
+        self.angle *= 0.68
 
     DESCRIPTION_SURF_W = 200
     def get_description_surf(self):
@@ -92,13 +97,23 @@ class Ingredient(Entity):
         self.description_surf = self.get_description_surf()
         self.angle = 0
         self.just_placed = False
+        if self.name not in self.SHADOW_CACHE:
+            shadow = pygame.mask.from_surface(self.img).to_surface()
+            shadow = swap_colors(shadow, (255, 255, 255), COLORS['super black'])
+            shadow.set_colorkey((0, 0, 0))
+            self.SHADOW_CACHE[self.name] = shadow
+        self.shadow = self.SHADOW_CACHE[self.name]
 
     def render(self, surf):
         img = self.img
+        shadow = self.shadow
         angle = round(self.angle)
         if angle != 0:
             img = pygame.transform.rotate(img, angle)
+            shadow = pygame.transform.rotate(shadow, angle)
         offset = 0.5 * (Vec2(img.get_size()) - self.img.get_size())
+        if not self.grid_pos:
+            surf.blit(shadow, self.pos - offset + self.SHADOW_OFFSET)
         surf.blit(img, self.pos - offset)
 
     def set_points(self, new_points):

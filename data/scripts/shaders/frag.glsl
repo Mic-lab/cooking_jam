@@ -12,7 +12,7 @@ out vec4 f_color;
 const ivec2 CANVAS_SIZE = ivec2(512, 288);
 const float PI = 3.14159265359;
 const vec2 gridSize = vec2(64, 64);
-const float caCoef = 0.005;
+const float caCoef = 0.008;
 const float shakeCoef = 0.01;
 
 vec2 rotateVec(vec2 vec, float theta) {
