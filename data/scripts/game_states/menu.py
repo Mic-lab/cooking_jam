@@ -97,7 +97,10 @@ class Menu(State):
                     if not name: name = 'Bob'
                     self.handler.name = name
                     # self.handler.transition_to(self.handler.states.Game)
-                    self.handler.transition_to(self.handler.states.Intro)
+                    if config.DEBUG:
+                        self.handler.transition_to(self.handler.states.Game)
+                    else:
+                        self.handler.transition_to(self.handler.states.Intro)
                     # pygame.mixer.music.set_volume(0.2)
                     # sfx.play_music('song_1.wav', -1)
                 elif key == 'scale':

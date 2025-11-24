@@ -53,7 +53,8 @@ class Customer(Entity):
                 (2, ingredient.Bread()),
                 (1, ingredient.Chicken()),
             ),
-            'points': 110,
+            # 'points': 110,
+            'points': 0,
         },
 
         {
@@ -201,8 +202,13 @@ class Game(State):
         self.lvl_start_timer = Timer(60, done=True)
         self.lvl_end_timer = Timer(120, done=True)
         self.stall_timer = Timer(60, done=True)
+        
+        if self.lvl is None:
+            self.lvl_surf = FONTS['basic'].get_surf(f'')
+        else:
+            self.lvl_surf = FONTS['basic'].get_surf(f'Level {self.lvl+1} / {len(Customer.ORDERS)}')
 
-        if config.DEBUG:
+        if config.DEBUG and 0:
             self.lvl_start_timer = Timer(5, done=True)
             self.lvl_end_timer = Timer(5, done=True)
 
@@ -212,6 +218,7 @@ class Game(State):
             sfx.play_music('song_1.wav', -1)
         else:
             self.end_level()
+
 
         self.handler.set_transition_duration(None)
 
@@ -225,7 +232,15 @@ class Game(State):
     def end_level(self):
         self.leaving = True
         self.lvl_end_timer.reset()
-        name = f'customer_{self.lvl - 1}'
+        if self.lvl is None:
+            self.customer = None
+            self.done_timer = Timer(120)
+            self.done_img = Animation.img_db['done']
+            pygame.mixer.music.set_volume(0.3)
+            sfx.play_music('ggs.wav')
+            return
+        else:
+            name = f'customer_{self.lvl - 1}'
         self.customer = Customer(username=self.username, pos=(0, 0), name=name, action='idle')
         self.customer.real_pos = self.get_start_pos()
         self.customer.real_pos[1] = self.get_end_pos_y()
@@ -234,6 +249,10 @@ class Game(State):
         self.customer.show_dialogue(done=True)
 
     def start_level(self):
+        if self.lvl == len(Customer.ORDERS) - 1:
+            self.handler.lvl = None
+            self.handler.transition_to(self.handler.states.Intro)
+            return
         self.leaving = False
         self.lvl_start_timer.reset()
         name = f'customer_{self.lvl}'
@@ -246,7 +265,9 @@ class Game(State):
         canvas = self.handler.canvas
         self.handler.canvas.blit(self.bg, (0, 0))
 
-        if self.leaving:
+        if self.customer is None:
+            pass
+        elif self.leaving:
             if not self.lvl_end_timer.done:
                 self.customer.real_pos[1] = lerp(self.start_pos[1],
                                                  self.get_start_pos()[1],
@@ -271,10 +292,15 @@ class Game(State):
                                                  self.get_end_pos_y(),
                                                  self.lvl_start_timer.get_ease_in_out_sin())
 
-        self.customer.update()
-        self.customer.render(canvas)
+        if self.customer:
+            self.customer.update()
+            self.customer.render(canvas)
+        else:
+            self.done_img.set_alpha(self.done_timer.ratio*255)
+            self.handler.canvas.blit(self.done_img, (200, 60))
+            self.done_timer.update()
 
-
+        canvas.blit(self.lvl_surf, (CANVAS_SIZE[0]*0.5-self.lvl_surf.get_width()*0.5, 5))
 
         # Update Buttons
         for key, btn in self.buttons.items():

@@ -23,8 +23,14 @@ class Intro(State):
         self.buttons = {
         }
         self.particle_gens = []
-        self.txt_surf = FONTS['basic'].get_surf('You only have 1 customer.')
-        self.timer = Timer(60)
+        if self.handler.lvl == 0:
+            self.timer = Timer(100)
+            text = 'You only have 1 customer.'
+        else:
+            pygame.mixer.music.fadeout(1000)
+            self.timer = Timer(200)
+            text = 'You have 0 customers.'
+        self.txt_surf = FONTS['basic'].get_surf(text)
         self.done = False
         self.handler.set_transition_duration(90)
 

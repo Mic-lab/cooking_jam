@@ -26,6 +26,8 @@ def load_sounds():
             sound.set_volume(0.7)
         elif file == 'win.wav':
             sound.set_volume(0.5)
+        elif file == 'pickup.wav':
+            sound.set_volume(1)
         else:
             sound.set_volume(0.3)
         print(sound)

@@ -9,8 +9,8 @@ from data.scripts import game_states
 from data.scripts.transition import Transition, TransitionState
 from data.scripts.animation import Animation
 
-
 pygame.mouse.set_visible(False)
+pygame.display.set_caption('Mealcraft')
 
 class GameHandler:
 
