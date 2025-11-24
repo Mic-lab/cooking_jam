@@ -19,6 +19,7 @@ class GameHandler:
         self.canvas = pygame.Surface(config.CANVAS_SIZE)
         self.clock = pygame.time.Clock()
         self.inputs = {'pressed': {}, 'released': {}, 'held': {}}
+        self.pending_transition_durations = []
         if config.DEBUG:
             self.lvl = 6
             self.set_state(self.states.Menu)
@@ -32,6 +33,10 @@ class GameHandler:
     def set_state(self, state):
         self.state = state(self)
 
+    def set_transition_duration(self, duration):
+        self.pending_transition_durations.append(duration)
+
+
     def transition_to(self, state):
         self.next_state = state
         self.transition.start()
@@ -42,6 +47,9 @@ class GameHandler:
             self.set_state(self.next_state)
         shader_handler.vars['transitionTimer'] = self.transition.timer.get_ease_squared()
         shader_handler.vars['transitionState'] = self.transition.state
+        if self.transition.state == 0:
+            if len(self.pending_transition_durations) > 0:
+                self.transition = Transition(self.pending_transition_durations.pop(0))
 
     def handle_input(self):
         for key in self.inputs['pressed']:
@@ -77,7 +85,6 @@ class GameHandler:
     def run(self):
         self.running = True
 
-        self.mouse_img = (Animation.img_db['mouse_1'], Animation.img_db['mouse_2'])
 
         while self.running:
             self.handle_input()
@@ -85,8 +92,6 @@ class GameHandler:
             if self.transition.state != TransitionState.STARTING:
                 self.state.update()
 
-            i = 1 if self.inputs['held'].get('mouse1') else 0
-            self.canvas.blit(self.mouse_img[i], self.inputs['mouse pos'] - Vec2(4, 0))
 
 
             self.handle_transition()

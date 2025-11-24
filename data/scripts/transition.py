@@ -10,8 +10,9 @@ class Transition:
 
     DURATION = 10
     
-    def __init__(self):
-        self.timer = Timer(Transition.DURATION)
+    def __init__(self, duration=None):
+        if duration is None: duration = Transition.DURATION
+        self.timer = Timer(duration)
         self.state = TransitionState.NONE
 
     def start(self):

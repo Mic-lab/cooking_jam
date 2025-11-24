@@ -13,6 +13,8 @@ from ..timer import Timer
 from ..utils import lerp
 from ..ingredient import Ingredient
 from .. import ingredient
+from ..transition import Transition
+from .. import sfx
 
 
 class Customer(Entity):
@@ -106,6 +108,7 @@ class Customer(Entity):
         self.name_surf = pygame.Surface(name_surf.get_size(), pygame.SRCALPHA)
         self.name_surf.fill((0, 0, 0, 100))
         self.name_surf.blit(name_surf)
+
 
     def get_dialogue_img(self):
         # s.fill((80, 80, 150))
@@ -205,8 +208,12 @@ class Game(State):
 
         if self.lvl == 0:
             self.start_level()
+            pygame.mixer.music.set_volume(0.2)
+            sfx.play_music('song_1.wav', -1)
         else:
             self.end_level()
+
+        self.handler.set_transition_duration(None)
 
     def get_start_pos(self):
         return [CANVAS_SIZE[0] * 0.5 - self.customer.img.get_width() * 0.5, CANVAS_SIZE[1]]

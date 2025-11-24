@@ -96,15 +96,10 @@ class Menu(State):
                     name = self.text_box.text.strip()
                     if not name: name = 'Bob'
                     self.handler.name = name
-                    self.handler.transition_to(self.handler.states.Game)
-                    pygame.mixer.music.set_volume(0.2)
-                    sfx.play_music('song_1.wav', -1)
-                elif key == 'music 1':
-                    sfx.play_music('song_1.wav', -1)
-                elif key == 'music 2':
-                    sfx.play_music('song_2.wav')
-                elif key == 'stop':
-                    pygame.mixer.music.fadeout(1000)
+                    # self.handler.transition_to(self.handler.states.Game)
+                    self.handler.transition_to(self.handler.states.Intro)
+                    # pygame.mixer.music.set_volume(0.2)
+                    # sfx.play_music('song_1.wav', -1)
                 elif key == 'scale':
                     config.scale = (config.scale + 1) % 5
                     if config.scale == 0: config.scale = 1
