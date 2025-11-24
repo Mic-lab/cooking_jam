@@ -87,6 +87,7 @@ class Ingredient(Entity):
         self.points = 0
         self.description_surf = self.get_description_surf()
         self.angle = 0
+        self.just_placed = False
 
     def render(self, surf):
         img = self.img
@@ -113,22 +114,31 @@ class Bread(Ingredient):
         
     def calculate_points(self, grid):
         points = 0
+        flash_coords = []
         for row in range(grid.size[1]):
             if self.grid_pos == (self.grid_pos[0], row): continue
             if isinstance(grid.data[row][self.grid_pos[0]], Bread):
                 points += 15
+                flash_style = 1
+            else:
+                flash_style = 0
+            flash_coords.append((self.grid_pos[0], row, flash_style))
         for col in range(grid.size[0]):
             if self.grid_pos == (col, self.grid_pos[1]): continue
             if isinstance(grid.data[self.grid_pos[1]][col], Bread):
                 points += 15
-        return points
+                flash_style = 1
+            else:
+                flash_style = 0
+            flash_coords.append((col, self.grid_pos[1], flash_style))
+        return points, flash_coords
 
 class Bagel(Ingredient):
     def __init__(self):
         description = '''+10 for every ingredient in between bagels'''
         super().__init__(name='bagel', description=description, group=True)
 
-    def calc_func(self, grid):
+    def calc_func(self, grid, switch=False):
         score = 0
         for row in grid:
             first = False
@@ -142,15 +152,39 @@ class Bagel(Ingredient):
                     score += added_score
                     added_score = 0
                 else:
-                    added_score += 10
+                    if first:
+                        added_score += 10
         return score
         
     def calculate_points(self, grid):
         score = 0
-        score += self.calc_func(grid.data)
-        transposed_grid = list(zip(*grid.data))
-        score += self.calc_func(transposed_grid)
-        return score
+        flash_coords = []
+
+        for i, matrix in enumerate((grid.data, list(zip(*grid.data)))):
+        # for i, matrix in enumerate((grid.data,)):
+            switch = i == 1
+            added_score = self.calc_func(matrix, switch)
+            score += added_score
+
+
+        # ---------------------------------------------------------
+        flash_coords = []
+        for row in range(grid.size[1]):
+            if self.grid_pos == (self.grid_pos[0], row):
+                continue
+            if isinstance(grid.data[row][self.grid_pos[0]], Bagel):
+                continue
+            flash_style = 1
+            flash_coords.append((self.grid_pos[0], row, flash_style))
+        for col in range(grid.size[0]):
+            if self.grid_pos == (col, self.grid_pos[1]):
+                continue
+            if isinstance(grid.data[self.grid_pos[1]][col], Bagel):
+                continue
+            flash_style = 1
+            flash_coords.append((col, self.grid_pos[1], flash_style))
+
+        return score, flash_coords
 
 class Tomato(Ingredient):
     def __init__(self):
@@ -158,13 +192,19 @@ class Tomato(Ingredient):
         super().__init__(name='tomato', description=description)
 
     def calculate_points(self, grid):
+        flash_coords = []
         score = 0
-        top = grid.fetch_data(self.grid_pos + Vec2(0, -1))
-        bottom = grid.fetch_data(self.grid_pos + Vec2(0, 1))
-        for item in (top, bottom):
+
+        for rel_pos in (Vec2(0, -1), Vec2(0, 1)):
+            pos = self.grid_pos + rel_pos
+            item = grid.fetch_data(pos)
             if isinstance(item, Cucumber):
                 score += 5
-        return score
+                i = 1
+            else:
+                i = 0
+            flash_coords.append((pos[0], pos[1], i))
+        return score, flash_coords
 
 class Cucumber(Ingredient):
     def __init__(self):
@@ -172,13 +212,18 @@ class Cucumber(Ingredient):
         super().__init__(name='cucumber', description=description)
 
     def calculate_points(self, grid):
+        flash_coords = []
         score = 0
-        top = grid.fetch_data(self.grid_pos + Vec2(1, 0))
-        bottom = grid.fetch_data(self.grid_pos + Vec2(-1, 0))
-        for item in (top, bottom):
+        for rel_pos in (Vec2(-1, 0), Vec2(1, 0)):
+            pos = self.grid_pos + rel_pos
+            item = grid.fetch_data(pos)
             if isinstance(item, Tomato):
                 score += 5
-        return score
+                i = 1
+            else:
+                i = 0
+            flash_coords.append((pos[0], pos[1], i))
+        return score, flash_coords
 
 class Chicken(Ingredient):
     def __init__(self):
@@ -186,15 +231,19 @@ class Chicken(Ingredient):
         super().__init__(name='chicken', description=description)
 
     def calculate_points(self, grid):
+        flash_coords = []
         score = 0
         for i in range(-1, 2):
             for j in range(-1, 2):
                 if (i, j) == (0, 0): continue
                 pos = self.grid_pos + Vec2(i, j)
                 item = grid.fetch_data(pos)
-                if item is not None:
+                if item:
                     score += 5
-        return score
+                else:
+                    pass
+                flash_coords.append((pos[0], pos[1], i))
+        return score, flash_coords
 
 name_map = {
     'bread': Bread,

@@ -19,7 +19,7 @@ class Customer(Entity):
     ORDERS = (
         {
             'want': ((2, ingredient.Bread()), ),
-            'points': 20,
+            'points': 30,
         },
         {
             'want': ((2, ingredient.Bread()), (2, ingredient.Bagel()), ),
@@ -179,6 +179,8 @@ class Customer(Entity):
 class Game(State):
 
     def __init__(self, *args, **kwargs):
+        pygame.mixer.music.set_volume(0.2)
+
         super().__init__(*args, **kwargs)
 
         self.username = self.handler.name
@@ -195,8 +197,9 @@ class Game(State):
         self.lvl_end_timer = Timer(120, done=True)
         self.stall_timer = Timer(30, done=True)
 
-        self.lvl_start_timer = Timer(5, done=True)
-        self.lvl_end_timer = Timer(5, done=True)
+        if config.DEBUG:
+            self.lvl_start_timer = Timer(5, done=True)
+            self.lvl_end_timer = Timer(5, done=True)
 
         if self.lvl == 0:
             self.start_level()

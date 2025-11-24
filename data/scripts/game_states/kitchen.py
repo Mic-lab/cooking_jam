@@ -8,6 +8,7 @@ from ..ingredient import Ingredient
 from ..font import FONTS
 from ..config import COLORS
 from ..timer import Timer
+from .. import sfx
 
 class Grid:
 
@@ -27,6 +28,7 @@ class Grid:
         self.points = 0
         self.calc_ingredients(self.game.order)
         self.update_score = False
+        self.flashed_tiles = []
 
     def fetch_data(self, coord: Vec2):
         try:
@@ -39,6 +41,7 @@ class Grid:
         return pygame.Rect(*(self.pos + 2*self.PAN + self.CELL_SIZE*Vec2(col, row)), self.CELL_SIZE, self.CELL_SIZE)
 
     def add_ingredient(self, ingredient, col, row):
+        ingredient.just_placed = True
         self.data[row][col] = ingredient
         self.update_stuff()
 
@@ -67,24 +70,69 @@ class Grid:
         self.calc_ingredients(order)
 
     def calculate_points(self):
-        print('Calculating points')
+        print('Calculating points -----')
         points = 0
 
+        flashed_tiles_coords = []
         groups = {}
-
         for row in self.data:
             for ing in row:
                 if ing:
+                    print(f'{ing = }')
                     if ing.group:
                         if type(ing) in groups:
+                            print('already did it')
                             ing.set_points(groups[type(ing)])
+
+                            if ing.just_placed:
+                                print('just got placed 1')
+                                flashed_tiles_coords.extend(ing.calculate_points(self)[1])
+                                ing.just_placed = False
                             continue
                         else:
-                            groups[type(ing)] = ing.calculate_points(self)
+                            print('first one')
+                            ing_points, added_coords = ing.calculate_points(self)
+                            groups[type(ing)] = ing_points
                             ing.set_points(groups[type(ing)])
+                            print(f'{ing.points=}')
                     else:
-                        ing.set_points(ing.calculate_points(self))
+                        ing_points, added_coords = ing.calculate_points(self)
+                        ing.set_points(ing_points)
+
+                    if ing.just_placed:
+                        print('just got placed 2')
+                        flashed_tiles_coords.extend(added_coords)
+                        ing.just_placed = False
+
+                    print(f'adding {ing.points}')
                     points += ing.points
+
+        print(f'Final: {points}')
+
+
+        # NOTE: should've probably made a class instead of a dict for this
+        added_flashed_tiles = []
+        for i, coord in enumerate(flashed_tiles_coords):
+            style = coord[2]
+            coord = coord[0], coord[1]
+            if not(0 <= coord[0] <= self.size[0] - 1): continue
+            if not(0 <= coord[1] <= self.size[1] - 1): continue
+
+            delay_timer = Timer(2*i+1)
+            animation_timer = Timer(30)
+
+            delay_timer = Timer(0, done=True)
+            animation_timer = Timer(30)
+
+            added_flashed_tiles.append({
+                'style': style,
+                'coord': coord,
+                'rect': self.get_rect(*coord),
+                'delay_timer': delay_timer,
+                'animation_timer': animation_timer
+            })
+        self.flashed_tiles.extend(added_flashed_tiles)
+
         self.points = points
 
     FONT_H = 12
@@ -103,14 +151,10 @@ class Grid:
             ing_list.append((v, ingredient.init_from_name(k)))
 
         used_ingredients = []
-        print('-'*90)
         for ing in order['want']:
-            print(f'{ing=} in {ing_list=} ?')
             inside = False
             for q, i in ing_list:
-                print(f'{q=} {ing[0]=} {i} {ing[1]}')
                 if q >= ing[0] and i.name == ing[1].name:
-                    print('YESSIR')
                     inside = True
                     break
             used_ingredients.append(inside)
@@ -118,7 +162,6 @@ class Grid:
         self.used_ingredients_surf = pygame.Surface((10, self.FONT_H*len(used_ingredients)))
         self.used_ingredients_surf.set_colorkey((0, 0, 0))
         for i, ing in enumerate(used_ingredients):
-            print(f'{ing=}')
             if ing:
                 s_name = 'check'
             else:
@@ -128,9 +171,26 @@ class Grid:
 
         self.used_ingredients = used_ingredients
 
+    def update(self):
+        new_flashed_tiles = []
+        for tile in self.flashed_tiles:
+            if not tile['animation_timer'].done:
+                new_flashed_tiles.append(tile)
+
+            tile['delay_timer'].update()
+            if tile['delay_timer'].done:
+                # if tile['animation_timer'].frame == 0: sfx.sounds['tile_flash.wav'].play()
+                tile['animation_timer'].update()
+        self.flashed_tiles = new_flashed_tiles
 
     def render(self, surf):
         surf.blit(self.bg_surf, self.pos)
+        for tile in self.flashed_tiles:
+            rect = tile['rect']
+            s = pygame.Surface(rect.size)
+            s.fill((COLORS['white2']))
+            s.set_alpha((0.4-tile['animation_timer'].get_ease_squared())*255)
+            surf.blit(s, rect.topleft)
 
 class Kitchen(State):
 
@@ -224,6 +284,8 @@ class Kitchen(State):
     INGREDIENT_BASE_POS = Vec2(200, 50)
 
     def __init__(self, *args, **kwargs):
+        pygame.mixer.music.set_volume(0.3)
+
         super().__init__(*args, **kwargs)
         self.bg = Animation.img_db['kitchen_bg']
        
@@ -275,6 +337,7 @@ class Kitchen(State):
         canvas.blit(self.order_img, (10, 50))
         canvas.blit(self.grid.used_ingredients_surf, Vec2(10, 50) + (80, 2))
 
+        self.grid.update()
         self.grid.render(canvas)
 
         # for row in range(self.grid.size[1]):
