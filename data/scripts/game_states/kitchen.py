@@ -123,7 +123,7 @@ class Grid:
             animation_timer = Timer(30)
 
             delay_timer = Timer(0, done=True)
-            animation_timer = Timer(30)
+            animation_timer = Timer(60)
 
             added_flashed_tiles.append({
                 'style': style,
@@ -214,6 +214,12 @@ class Kitchen(State):
         (3, 3),
         (4, 3),
         (5, 5),
+        (5, 5),
+        (1, 6),
+        (5, 5),
+        (3, 3),
+        (5, 5),
+        (5, 5),
     )
 
     # shouldve prolly used strings but im in too deep now
@@ -269,24 +275,105 @@ class Kitchen(State):
          ingredient.Bagel(),
          ),
 
+        (ingredient.Sauce(),
+         ingredient.Chicken(),
+         ingredient.Chicken(),
+         ),
 
-        (ingredient.Bagel(),
-         ingredient.Bagel(),
-         ingredient.Bagel(),
-         ingredient.Chicken(),
-         ingredient.Chicken(),
-         ingredient.Chicken(),
-         ingredient.Bagel(),
-         ingredient.Bread(),
-         ingredient.Bread(),
-         ingredient.Bread(),
-         ingredient.Bread(),
-         ingredient.Cucumber(),
-         ingredient.Cucumber(),
-         ingredient.Tomato(),
-         ingredient.Tomato(),
-         ingredient.Tomato()),
+        (
+            ingredient.Sauce(),
+            ingredient.Chicken(),
+            ingredient.Cucumber(),
+            ingredient.Cucumber(),
+            ingredient.Tomato(),
+        ),
 
+        (
+            ingredient.Bread(),
+            ingredient.Bread(),
+            ingredient.Bread(),
+            ingredient.Sauce(),
+            ingredient.Sauce(),
+            ingredient.Sauce(),
+            ingredient.Chicken(),
+            ingredient.Chicken(),
+        ),
+
+        (
+            ingredient.Sauce(),
+            ingredient.Chicken(),
+            ingredient.Bagel(),
+            ingredient.Bagel(),
+            ingredient.Cucumber(),
+        ),
+
+        (
+            ingredient.Sauce(),
+            ingredient.Sauce(),
+            ingredient.Chicken(),
+            ingredient.Chicken(),
+            ingredient.Tomato(),
+            ingredient.Tomato(),
+            ingredient.Tomato(),
+            ingredient.Cucumber(),
+            ingredient.Cucumber(),
+            ingredient.Cucumber(),
+        ),
+
+        (
+            ingredient.Bagel(),
+            ingredient.Bagel(),
+            ingredient.Bagel(),
+            ingredient.Bagel(),
+            ingredient.Sauce(),
+            ingredient.Chicken(),
+            ingredient.Chicken(),
+            ingredient.Chicken(),
+            ingredient.Chicken(),
+            ingredient.Tomato(),
+            ingredient.Tomato(),
+            ingredient.Tomato(),
+            ingredient.Tomato(),
+            ingredient.Tomato(),
+            ingredient.Tomato(),
+            ingredient.Cucumber(),
+            ingredient.Cucumber(),
+            ingredient.Cucumber(),
+            ingredient.Cucumber(),
+            ingredient.Cucumber(),
+            ingredient.Cucumber(),
+        ),
+
+
+        (
+            ingredient.Sauce(),
+            ingredient.Sauce(),
+            ingredient.Sauce(),
+            ingredient.Sauce(),
+            ingredient.Sauce(),
+            ingredient.Sauce(),
+            ingredient.Bagel(),
+            ingredient.Bagel(),
+            ingredient.Bagel(),
+            ingredient.Chicken(),
+            ingredient.Chicken(),
+            ingredient.Chicken(),
+            ingredient.Chicken(),
+            ingredient.Bagel(),
+            ingredient.Bread(),
+            ingredient.Bread(),
+            ingredient.Bread(),
+            ingredient.Bread(),
+            ingredient.Cucumber(),
+            ingredient.Cucumber(),
+            ingredient.Cucumber(),
+            ingredient.Cucumber(),
+            ingredient.Cucumber(),
+            ingredient.Tomato(),
+            ingredient.Tomato(),
+            ingredient.Tomato(),
+            ingredient.Tomato(),
+            ingredient.Tomato()),
     )
 
     INGREDIENT_BASE_POS = Vec2(200, 50)

@@ -69,10 +69,14 @@ class Ingredient(Entity):
         self.angle += vel.x * 0.85
         self.angle *= 0.68
 
+    @property
+    def description_title(self):
+        return self.name.title()
+
     DESCRIPTION_SURF_W = 200
     def get_description_surf(self):
         point_info = '  Collectively' if self.group else ''
-        name_surf = FONTS['basic'].get_surf(self.name.title() + f'    (+{self.points}{point_info})', COLORS['blue4'])
+        name_surf = FONTS['basic'].get_surf(self.description_title + f'    (+{self.points}{point_info})', COLORS['blue4'])
         font_surf = FONTS['basic'].get_surf(self.description,
                                             wraplength=self.DESCRIPTION_SURF_W,
                                             color=COLORS['white1'])
@@ -264,12 +268,44 @@ class Chicken(Ingredient):
                 flash_coords.append((pos[0], pos[1], i))
         return score, flash_coords
 
+class Sauce(Ingredient):
+    def __init__(self):
+        description = '+20 For every adjacent chicken\n+0 For every adjacent Hot Sauce\n-20 For every adjacent other ingredient'
+        super().__init__(name='sauce', description=description)
+
+    @property
+    def description_title(self):
+        return 'Hot Sauce'
+
+    def calculate_points(self, grid):
+        flash_coords = []
+        points = 0
+        for offset in (
+            (-1, 0),
+            (1, 0),
+            (0, -1),
+            (0, 1),):
+            adj_tile_coord = self.grid_pos + Vec2(offset)
+            adj_tile = grid.fetch_data(adj_tile_coord)
+            flash_coords.append((*adj_tile_coord, 1))
+            if not adj_tile:
+                continue
+            elif isinstance(adj_tile, Sauce):
+                pass
+            elif isinstance(adj_tile, Chicken):
+                points += 15
+            else:
+                points -= 15
+        print(f'{flash_coords=}')
+        return points, flash_coords
+
 name_map = {
     'bread': Bread,
     'bagel': Bagel,
     'tomato': Tomato,
     'cucumber': Cucumber,
     'chicken': Chicken,
+    'sauce': Sauce,
 }
 def init_from_name(name):
     return name_map[name]()

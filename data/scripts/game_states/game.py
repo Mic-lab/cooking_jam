@@ -53,10 +53,35 @@ class Customer(Entity):
                 (2, ingredient.Bread()),
                 (1, ingredient.Chicken()),
             ),
-            # 'points': 110,
-            'points': 0,
+            'points': 110,
+        },
+        {
+            'want': (
+                (1, ingredient.Chicken()),
+                (1, ingredient.Sauce())),
+            'points': -1,
         },
 
+        {
+            'want': (),
+            'points': -1,
+        },
+        {
+            'want': (),
+            'points': -1,
+        },
+        {
+            'want': (),
+            'points': -1,
+        },
+        {
+            'want': (),
+            'points': -1,
+        },
+        {
+            'want': (),
+            'points': -1,
+        },
         {
             'want': (),
             'points': -1,
@@ -82,7 +107,19 @@ class Customer(Entity):
          'Thanks.'),
         ('Bob', 'Since when did you have chicken? Ok then I\'ll take a chicken bagel sandwhich.',
          'Wow. Beautiful assortment.'),
+        ('Bob', 'Place holder',
+         'Thanks'),
         ('Bob', 'That\'s all i have for the game as of now',
+         'Thanks'),
+        ('Bob', 'Place holder',
+         'Thanks'),
+        ('Bob', 'Place holder',
+         'Thanks'),
+        ('Bob', 'Place holder',
+         'Thanks'),
+        ('Bob', 'Place holder',
+         'Thanks'),
+        ('Bob', 'Place holder',
          'Thanks'),
         ('Bob', 'Place holder',
          'Thanks'),
@@ -94,10 +131,11 @@ class Customer(Entity):
 
     def __init__(self, username, *args, **kwargs):
         name = kwargs['name']
-        n = int(name[-1])
+        n = int(name.split('_')[-1])
         kwargs['name'] = 'customer_0'
         super().__init__(*args, **kwargs)
         self.order = self.ORDERS[n]
+        print(f'{n=}')
         self.dialogue = self.DIALOGUES[n]
         self.dialogue_img = self.get_dialogue_img()
         self.dialogue_img_2 = self.get_dialogue_img_2()
@@ -249,13 +287,15 @@ class Game(State):
         self.customer.show_dialogue(done=True)
 
     def start_level(self):
-        if self.lvl == len(Customer.ORDERS) - 1:
+        print(f'start_level {self.lvl}')
+        if self.lvl == len(Customer.ORDERS):
             self.handler.lvl = None
             self.handler.transition_to(self.handler.states.Intro)
             return
         self.leaving = False
         self.lvl_start_timer.reset()
         name = f'customer_{self.lvl}'
+        print(f'{name=}')
         self.customer = Customer(username=self.username, pos=(0, 0), name=name, action='idle')
         self.customer.real_pos = self.get_start_pos()
         self.start_pos = self.customer.real_pos.copy()

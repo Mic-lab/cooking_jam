@@ -21,7 +21,7 @@ class GameHandler:
         self.inputs = {'pressed': {}, 'released': {}, 'held': {}}
         self.pending_transition_durations = []
         if config.DEBUG:
-            self.lvl = 6
+            self.lvl = 11
             self.set_state(self.states.Menu)
             # self.set_state(self.states.Game)
         else:

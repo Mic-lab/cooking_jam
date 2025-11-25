@@ -20,4 +20,4 @@ COLORS = {
 
 fps = 60
 
-DEBUG = False
+DEBUG = True
