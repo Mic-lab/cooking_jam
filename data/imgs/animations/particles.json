@@ -6,7 +6,7 @@
     "trimmed": true,
     "spriteSourceSize": { "x": 10, "y": 12, "w": 12, "h": 10 },
     "sourceSize": { "w": 32, "h": 32 },
-    "duration": 100
+    "duration": 50
    },
    {
     "filename": "basic",
@@ -15,7 +15,7 @@
     "trimmed": true,
     "spriteSourceSize": { "x": 10, "y": 12, "w": 12, "h": 10 },
     "sourceSize": { "w": 32, "h": 32 },
-    "duration": 100
+    "duration": 50
    },
    {
     "filename": "basic",
@@ -24,7 +24,7 @@
     "trimmed": true,
     "spriteSourceSize": { "x": 10, "y": 12, "w": 12, "h": 10 },
     "sourceSize": { "w": 32, "h": 32 },
-    "duration": 100
+    "duration": 50
    },
    {
     "filename": "basic",
@@ -33,7 +33,7 @@
     "trimmed": true,
     "spriteSourceSize": { "x": 10, "y": 12, "w": 12, "h": 10 },
     "sourceSize": { "w": 32, "h": 32 },
-    "duration": 100
+    "duration": 50
    },
    {
     "filename": "basic",
@@ -42,7 +42,7 @@
     "trimmed": true,
     "spriteSourceSize": { "x": 10, "y": 12, "w": 12, "h": 10 },
     "sourceSize": { "w": 32, "h": 32 },
-    "duration": 100
+    "duration": 50
    },
    {
     "filename": "basic",
@@ -51,7 +51,7 @@
     "trimmed": true,
     "spriteSourceSize": { "x": 10, "y": 12, "w": 12, "h": 10 },
     "sourceSize": { "w": 32, "h": 32 },
-    "duration": 100
+    "duration": 50
    },
    {
     "filename": "basic",
@@ -60,7 +60,7 @@
     "trimmed": true,
     "spriteSourceSize": { "x": 10, "y": 12, "w": 12, "h": 10 },
     "sourceSize": { "w": 32, "h": 32 },
-    "duration": 100
+    "duration": 50
    },
    {
     "filename": "arrow",
@@ -164,6 +164,9 @@
    { "name": "basic", "from": 0, "to": 6, "direction": "forward" },
    { "name": "arrow", "from": 7, "to": 10, "direction": "forward" },
    { "name": "group", "from": 11, "to": 16, "direction": "forward" }
+  ],
+  "layers": [
+   { "name": "Layer 1", "opacity": 255, "blendMode": "normal" }
   ],
   "slices": [
   ]

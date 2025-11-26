@@ -29,6 +29,16 @@ class Timer:
         # return 1 - (1 - self.frame) ** 2
         return 1 - (1 - self.ratio) ** 2
 
+    def weird_ease(self):
+        # https://www.desmos.com/calculator/9wy6auxykr
+        x = self.ratio
+
+        # k = -0.5
+        d = 30
+        k = d/(self.duration - d)
+        a = 1 / (1 + k)**2
+        return a * max(x+k, 0)**2
+
     C4 = (2 * math.pi) / 3;
     def easeOutElastic(self):
         x = self.ratio

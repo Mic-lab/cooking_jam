@@ -10,13 +10,14 @@ from ..config import COLORS
 from ..timer import Timer
 from .. import sfx
 from ..mgl import shader_handler
+from ..particle import ParticleGenerator
 
 class Grid:
 
     PAN = Vec2(1, 1)
     CELL_SIZE = 24
     CENTER_POS = Vec2(415, 110)
-    CENTER_POS = Vec2(423, 100)
+    CENTER_POS = Vec2(423, 130)
 
     cell_img = Animation.img_db['cell']
 
@@ -203,7 +204,7 @@ class Grid:
 class Kitchen(State):
 
     SCORE_POS = Vec2(400, 50)
-    SCORE_POS = Vec2(400, 170)
+    SCORE_POS = Vec2(400, 220)
 
     GRID_SIZES = (
         (3, 3),
@@ -215,9 +216,9 @@ class Kitchen(State):
         (4, 3),
         (5, 5),
         (5, 5),
+        (3, 3),
         (1, 6),
         (5, 5),
-        (3, 3),
         (5, 5),
         (5, 5),
     )
@@ -376,12 +377,14 @@ class Kitchen(State):
             ingredient.Tomato()),
     )
 
-    INGREDIENT_BASE_POS = Vec2(200, 50)
+    INGREDIENT_BASE_POS = Vec2(185, 40)
 
     def __init__(self, *args, **kwargs):
         pygame.mixer.music.set_volume(0.3)
 
         super().__init__(*args, **kwargs)
+        self.old_mouse_pos = None
+        self.particle_gens = []
         self.bg = Animation.img_db['kitchen_bg']
         self.ca_timer = Timer(10, done=True)
        
@@ -442,10 +445,17 @@ class Kitchen(State):
         #         from random import randint
         #         pygame.draw.rect(canvas, (30, 30, randint(1, 255)), r)
 
+        self.particle_gens = ParticleGenerator.update_generators(self.particle_gens)
+        for particle_gen in self.particle_gens:
+            particle_gen.render(self.handler.canvas)
+
         hovered_ingredient = None
         for ing in self.ingredients:
+            old_selected = ing.selected
             ing.update(self.handler.inputs, self.grid, self.selected_ingredient)
             if ing.selected:
+                if not old_selected:
+                    pass
                 self.selected_ingredient = ing
                 if ing.hovered_cell:
                     hovered_cell = ing.hovered_cell
@@ -457,6 +467,17 @@ class Kitchen(State):
                     canvas.blit(s, rect.topleft)
             elif ing is self.selected_ingredient:
                 self.selected_ingredient = None
+                if self.old_mouse_pos is None:
+                    vel = Vec2(0)
+                else:
+                    vel = -Vec2(self.old_mouse_pos) + self.handler.inputs['mouse pos']
+                if vel.length() > 2:
+                    vel.scale_to_length(2)
+                p = ParticleGenerator.TEMPLATES['smoke']['base_particle']
+                p.vel = vel
+                self.particle_gens.append(
+                    ParticleGenerator.from_template(ing.rect.center, 'smoke', base_particle=p)
+                )
 
             if ing.rect.collidepoint(self.handler.inputs['mouse pos']):
                 hovered_ingredient = ing
@@ -515,7 +536,7 @@ class Kitchen(State):
                     self.handler.transition_to(self.handler.states.Game)
                     self.handler.lvl += 1
 
-
+        self.old_mouse_pos = self.handler.inputs['mouse pos']
         shader_handler.vars['caTimer'] = self.ca_timer.ratio ** 2
 
     def generate_point_surf(self):

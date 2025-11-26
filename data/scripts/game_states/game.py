@@ -35,7 +35,11 @@ class Customer(Entity):
             'points': 40,
         },
         {
-            'want': (),
+            'want': (
+                (3, ingredient.Bread()),
+                (3, ingredient.Cucumber()),
+                (3, ingredient.Tomato()),
+            ),
             'points': 125,
         },
         {
@@ -59,77 +63,106 @@ class Customer(Entity):
             'want': (
                 (1, ingredient.Chicken()),
                 (1, ingredient.Sauce())),
-            'points': -1,
+            'points': 50,
         },
 
         {
-            'want': (),
-            'points': -1,
+            'want': (
+                (1, ingredient.Sauce()),
+                (1, ingredient.Chicken()),
+                (2, ingredient.Cucumber()),
+                (1, ingredient.Tomato()),
+            ),
+            'points': 45,
         },
         {
-            'want': (),
-            'points': -1,
+            'want': (
+                (3, ingredient.Sauce()),
+                (2, ingredient.Chicken()),
+            ),
+            'points': 195,
         },
         {
-            'want': (),
-            'points': -1,
+            'want': (
+                (2, ingredient.Bagel()),
+                (1, ingredient.Chicken()),
+                (1, ingredient.Sauce()),
+            ),
+            'points': 55,
         },
         {
-            'want': (),
-            'points': -1,
+            'want': (
+                (2, ingredient.Sauce()),
+                (2, ingredient.Chicken()),
+            ),
+            'points': 140,
         },
         {
-            'want': (),
-            'points': -1,
+            'want': (
+                (1, ingredient.Sauce()),
+                (4, ingredient.Bagel()),
+                (4, ingredient.Chicken()),
+                (4, ingredient.Bagel()),
+            ),
+            'points': 340,
         },
-        {
-            'want': (),
-            'points': -1,
-        },
+        # {
+        #     'want': (),
+        #     'points': -1,
+        # },
 
 
 
 
     )
         
-    DIALOGUES = (
-        ('John Smith', 'Hello. May I please have a sandwhich, but without the filling?',
-         'Exactly as I asked for. Thanks!'),
-        ('Bob', 'Hi, I\'d like a sandwhich bagel (not to be confused with a bagel sandwhich)',
-         'Oh yeah, that\'s the stuff'),
-        ('Bob', 'I\'m feeling a bit spicy today. I\'ll have vegetable bagel.',
-         'It\'s overflowing... but that\'s ok'),
-        ('Bob', 'Surprise me.',
-         'Alternating the tomato\'s and cucumbers I see. I like it.'),
-        ('Bob', 'I\'ll have a Double Triple Bossy Deluxe on a raft, 4x4 animal style, extra shingles with a shimmy and a squeeze, light axle grease, make it cry, burn it, and let it swim',
-         'Acceptable.'),
-        ('Bob', 'I\'ll try a caesar salad now',
-         'Thanks.'),
-        ('Bob', 'Since when did you have chicken? Ok then I\'ll take a chicken bagel sandwhich.',
-         'Wow. Beautiful assortment.'),
-        ('Bob', 'Place holder',
-         'Thanks'),
-        ('Bob', 'That\'s all i have for the game as of now',
-         'Thanks'),
-        ('Bob', 'Place holder',
-         'Thanks'),
-        ('Bob', 'Place holder',
-         'Thanks'),
-        ('Bob', 'Place holder',
-         'Thanks'),
-        ('Bob', 'Place holder',
-         'Thanks'),
-        ('Bob', 'Place holder',
-         'Thanks'),
-        ('Bob', 'Place holder',
-         'Thanks'),
-        ('Bob', 'Place holder',
-         'Thanks'),
-        ('Bob', 'Place holder',
-         'Thanks'),
-    )
 
     def __init__(self, username, *args, **kwargs):
+
+        self.DIALOGUES = (
+            ('John Smith', 'Hello. May I please have a sandwhich, but without the filling? Also, don\'t forget to hover your mouse over the ingredients to view their description.',
+             'Exactly as I asked for. Thanks!'),
+            ('Bob', 'Hi, I\'d like a sandwhich bagel (not to be confused with a bagel sandwhich)',
+             'Oh yeah, that\'s the stuff'),
+            ('Bob', 'I\'m feeling a bit spicy today. I\'ll have vegetable bagel.',
+             'It\'s overflowing... but that\'s ok'),
+            ('Bob', 'Now take everything you\'ve learnt to make me the ultimate sandwhich.',
+             'Alternating the tomato\'s and cucumbers I see. I like it.'),
+            ('Bob', 'I\'ll have a Double Triple Bossy Deluxe on a raft, 4x4 animal style, extra shingles with a shimmy and a squeeze, light axle grease, make it cry, burn it, and let it swim',
+             'Acceptable.'),
+            ('Bob', 'I\'ll try a caesar salad now',
+             'I\'m so healthy B)'),
+            ('Bob', 'I didn\'t know you had chicken. In that case, I\'ll take a chicken bagel sandwhich.',
+             'Wow. Beautiful assortment.'),
+            ('Bob', 'Now I\'m *actually* feeling spicy. So give me hawwt sauce! And pair that with chicken.',
+             'This one\'s on on the house ;)\nOh wait you\'re supposed to say that.'),
+            ('Bob', 'Maybe sprinkle some vegetables in there.\nSorry, I should\'ve told you in advance hihi',
+             'Mmmm, just like how my mom\'s son used to make it.'),
+            ('Bob', 'Now make me a chicken sandwhich. Please.',
+             'It\'s a bit too spicy, but thanks I guess. *tsundere hmph*'),
+            ('Bob', 'Make a chicken bagel, but please don\'t make don\'t make the bagel soggy.',
+             'You made half of the bagel float. How sophisticated :O'),
+            ('Bob', 'I\'m starting to get kind of stuffed, I\'ll just have a small bowl of stir-fry',
+             'I wouldn\'t consider that a small bowl, but not gonna gonna complain about free food.'),
+            ('Bob', 'I finally finished the stir-fry. Oh, how did I eat it so fast? Oh, you know... I just put it in my belly. Anyways, I\'m super stuffed now. So I won\'t be having anything. Wait why does it say "Ingredients" underneath? *gulp*',
+             f'>_< That\'s way too much. It will take me some time to finish this. But I will always be your number 1 customer, {username}.'),
+            ('Bob', 'Place holder',
+             'Thanks'),
+            ('Bob', 'Place holder',
+             'Thanks'),
+            ('Bob', 'Place holder',
+             'Thanks'),
+            ('Bob', 'Place holder',
+             'Thanks'),
+        )
+
+
+
+
+
+
+
+
         name = kwargs['name']
         n = int(name.split('_')[-1])
         kwargs['name'] = 'customer_0'
@@ -147,6 +180,7 @@ class Customer(Entity):
         self.name_surf = pygame.Surface(name_surf.get_size(), pygame.SRCALPHA)
         self.name_surf.fill((0, 0, 0, 100))
         self.name_surf.blit(name_surf)
+
 
 
     def get_dialogue_img(self):
@@ -238,7 +272,6 @@ class Game(State):
         self.bg = Animation.img_db['bg']
         self.lvl = self.handler.lvl
         self.lvl_start_timer = Timer(60, done=True)
-        self.lvl_end_timer = Timer(120, done=True)
         self.stall_timer = Timer(60, done=True)
         
         if self.lvl is None:
@@ -250,7 +283,7 @@ class Game(State):
             self.lvl_start_timer = Timer(5, done=True)
             self.lvl_end_timer = Timer(5, done=True)
 
-        if self.lvl == 0:
+        if self.lvl == self.handler.start_lvl:
             self.start_level()
             pygame.mixer.music.set_volume(0.2)
             sfx.play_music('song_1.wav', -1)
@@ -269,7 +302,6 @@ class Game(State):
 
     def end_level(self):
         self.leaving = True
-        self.lvl_end_timer.reset()
         if self.lvl is None:
             self.customer = None
             self.done_timer = Timer(120)
@@ -285,6 +317,11 @@ class Game(State):
         self.start_pos = self.customer.real_pos.copy()
 
         self.customer.show_dialogue(done=True)
+
+        words = len(self.customer.dialogue[2].split())
+        print(f'{words=}')
+        self.lvl_end_timer = Timer(30 + 15 * words, done=True)
+        self.lvl_end_timer.reset()
 
     def start_level(self):
         print(f'start_level {self.lvl}')
@@ -311,10 +348,12 @@ class Game(State):
             if not self.lvl_end_timer.done:
                 self.customer.real_pos[1] = lerp(self.start_pos[1],
                                                  self.get_start_pos()[1],
-                                                 self.lvl_end_timer.get_ease_in_out_sin() * self.lvl_end_timer.ratio**10)
+                                                 self.lvl_end_timer.weird_ease() * self.lvl_end_timer.ratio**10)
+                                                 # self.lvl_end_timer.get_ease_in_out_sin() * self.lvl_end_timer.ratio**10)
             else:
                 self.stall_timer.reset()
                 self.start_level()
+            self.lvl_end_timer.update()
         else:
 
             if self.lvl_start_timer.done:
@@ -357,4 +396,3 @@ class Game(State):
                     self.handler.order = self.customer.order
 
         self.lvl_start_timer.update()
-        self.lvl_end_timer.update()

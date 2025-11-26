@@ -28,7 +28,7 @@ class Intro(State):
             text = 'You only have 1 customer.'
         else:
             pygame.mixer.music.fadeout(1000)
-            self.timer = Timer(200)
+            self.timer = Timer(100)
             text = 'You have 0 customers.'
         self.txt_surf = FONTS['basic'].get_surf(text)
         self.done = False

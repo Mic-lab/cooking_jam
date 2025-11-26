@@ -57,9 +57,9 @@ class Menu(State):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        rects = [pygame.Rect(30, 30+i*30, 110, 20) for i in range(6)]
+        rects = [pygame.Rect(290, 115+i*30, 110, 20) for i in range(6)]
         self.buttons = {
-            'game': Button(rects[0], 'harloo', 'basic'),
+            'game': Button(rects[0], 'Get cooking', 'basic'),
             'scale': Button(rects[1], f'Window Scale ({config.scale}x)', 'basic'),
         }
         self.name_surf = FONTS['basic'].get_surf('Enter your name > ')
@@ -80,11 +80,9 @@ class Menu(State):
         if self.handler.inputs['pressed'].get('mouse1'):
             self.particle_gens.append(ParticleGenerator.from_template(self.handler.inputs['mouse pos'], 'smoke'))
 
-        self.particle_gens = ParticleGenerator.update_generators(self.particle_gens)
-        for particle_gen in self.particle_gens:
-            particle_gen.render(self.handler.canvas)
-
-        self.handler.canvas.set_at(self.handler.inputs['mouse pos'], (255, 0, 0))
+        # self.particle_gens = ParticleGenerator.update_generators(self.particle_gens)
+        # for particle_gen in self.particle_gens:
+        #     particle_gen.render(self.handler.canvas)
 
         # Update Buttons
         for key, btn in self.buttons.items():
@@ -114,4 +112,4 @@ class Menu(State):
 
         text = [f'{round(self.handler.clock.get_fps())} fps',
                 ]
-        self.handler.canvas.blit(FONTS['basic'].get_surf('\n'.join(text)), (0, 0))
+        self.handler.canvas.blit(FONTS['basic'].get_surf('\n'.join(text)), (1, 1))

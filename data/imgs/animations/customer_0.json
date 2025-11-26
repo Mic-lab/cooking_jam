@@ -1,21 +1,39 @@
 { "frames": [
    {
     "filename": "idle",
-    "frame": { "x": 0, "y": 0, "w": 48, "h": 62 },
+    "frame": { "x": 0, "y": 0, "w": 60, "h": 58 },
     "rotated": false,
     "trimmed": true,
-    "spriteSourceSize": { "x": 38, "y": 34, "w": 48, "h": 62 },
+    "spriteSourceSize": { "x": 33, "y": 40, "w": 60, "h": 58 },
     "sourceSize": { "w": 128, "h": 128 },
-    "duration": 500
+    "duration": 200
    },
    {
     "filename": "idle",
-    "frame": { "x": 48, "y": 0, "w": 48, "h": 62 },
+    "frame": { "x": 60, "y": 0, "w": 60, "h": 58 },
     "rotated": false,
     "trimmed": true,
-    "spriteSourceSize": { "x": 38, "y": 34, "w": 48, "h": 62 },
+    "spriteSourceSize": { "x": 33, "y": 40, "w": 60, "h": 58 },
     "sourceSize": { "w": 128, "h": 128 },
-    "duration": 500
+    "duration": 100
+   },
+   {
+    "filename": "idle",
+    "frame": { "x": 120, "y": 0, "w": 60, "h": 58 },
+    "rotated": false,
+    "trimmed": true,
+    "spriteSourceSize": { "x": 33, "y": 40, "w": 60, "h": 58 },
+    "sourceSize": { "w": 128, "h": 128 },
+    "duration": 200
+   },
+   {
+    "filename": "idle",
+    "frame": { "x": 180, "y": 0, "w": 60, "h": 58 },
+    "rotated": false,
+    "trimmed": true,
+    "spriteSourceSize": { "x": 33, "y": 40, "w": 60, "h": 58 },
+    "sourceSize": { "w": 128, "h": 128 },
+    "duration": 100
    }
  ],
  "meta": {
@@ -23,7 +41,7 @@
   "version": "1.x-dev",
   "image": "customer_0.png",
   "format": "RGBA8888",
-  "size": { "w": 96, "h": 62 },
+  "size": { "w": 240, "h": 58 },
   "scale": "1",
   "slices": [
   ]

@@ -4,6 +4,7 @@ from .font import FONTS
 from .animation import Animation
 from .sfx import sounds
 from .utils import swap_colors
+from . import config
 from pygame import Vector2 as Vec2
 import pygame
 from random import randint
@@ -65,9 +66,21 @@ class Ingredient(Entity):
                         self.hovered_cell = (col, row, rect, empty)
                         break
 
-        vel = self.real_pos - self.old_pos
+        self.vel = self.real_pos - self.old_pos
+        vel = self.vel
         self.angle += vel.x * 0.85
         self.angle *= 0.68
+
+        if self.real_pos[0] > config.CANVAS_SIZE[0] - 50:
+            self.real_pos[0] = config.CANVAS_SIZE[0] - 50
+        if self.real_pos[1] > config.CANVAS_SIZE[1] - 50:
+            self.real_pos[1] = config.CANVAS_SIZE[1] - 50
+
+        if self.real_pos[0] < 20:
+            self.real_pos[0] = 20
+        if self.real_pos[1] < 20:
+            self.real_pos[1] = 20
+            
 
     @property
     def description_title(self):

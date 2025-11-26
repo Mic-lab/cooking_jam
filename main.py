@@ -1,3 +1,6 @@
+# If you're looking over the code, just know it was made in a rush
+# so it's probably not a good reference
+
 import sys
 import pygame
 from pygame import Vector2 as Vec2
@@ -20,12 +23,13 @@ class GameHandler:
         self.clock = pygame.time.Clock()
         self.inputs = {'pressed': {}, 'released': {}, 'held': {}}
         self.pending_transition_durations = []
+        self.start_lvl = 5
         if config.DEBUG:
             self.lvl = 11
             self.set_state(self.states.Menu)
             # self.set_state(self.states.Game)
         else:
-            self.lvl = 0
+            self.lvl = self.start_lvl
             self.set_state(self.states.Menu)
         self.transition = Transition()
         shader_handler.vars['scale'] = config.scale
@@ -47,8 +51,9 @@ class GameHandler:
             self.set_state(self.next_state)
         shader_handler.vars['transitionTimer'] = self.transition.timer.get_ease_squared()
         shader_handler.vars['transitionState'] = self.transition.state
-        if self.transition.state == 0:
+        if self.transition.state in {0, 1}:
             if len(self.pending_transition_durations) > 0:
+                print('pop')
                 self.transition = Transition(self.pending_transition_durations.pop(0))
 
     def handle_input(self):

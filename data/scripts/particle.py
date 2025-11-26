@@ -1,4 +1,5 @@
 import random
+from .config import COLORS
 from .timer import Timer
 from .entity import PhysicsEntity
 from . import utils
@@ -53,9 +54,9 @@ class ParticleGenerator:
 
     TEMPLATES = {
         'smoke': {
-            'base_particle': Particle(action='basic', vel=(0, 0)),
-            'vel_randomness': 0.5,
-            'rate': 10
+            'base_particle': Particle(action='basic', vel=(0, 0), angled=True, color=COLORS['white2']),
+            'vel_randomness': 1,
+            'rate': 6
         },
         'angle test': {
             'base_particle': Particle(action='arrow', vel=(0, -2), acceleration=(0, 0.05), angled=True, color=(50, 100, 240)),
@@ -76,7 +77,6 @@ class ParticleGenerator:
     @classmethod
     def from_template(cls, pos, template_key, **overwrites):
         config = ParticleGenerator.TEMPLATES[template_key]
-        # https://stackoverflow.com/questions/38987/how-do-i-merge-two-dictionaries-in-a-single-expression-in-python
         config = config | overwrites  
         return cls(pos=pos, **config)
 
