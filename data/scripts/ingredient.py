@@ -76,10 +76,10 @@ class Ingredient(Entity):
         if self.real_pos[1] > config.CANVAS_SIZE[1] - 50:
             self.real_pos[1] = config.CANVAS_SIZE[1] - 50
 
-        if self.real_pos[0] < 20:
-            self.real_pos[0] = 20
-        if self.real_pos[1] < 20:
-            self.real_pos[1] = 20
+        if self.real_pos[0] < 10:
+            self.real_pos[0] = 10
+        if self.real_pos[1] < 10:
+            self.real_pos[1] = 10
             
 
     @property

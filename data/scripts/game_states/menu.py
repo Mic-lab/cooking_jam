@@ -59,7 +59,7 @@ class Menu(State):
 
         rects = [pygame.Rect(290, 115+i*30, 110, 20) for i in range(6)]
         self.buttons = {
-            'game': Button(rects[0], 'Get cooking', 'basic'),
+            'game': Button(rects[0], 'Start cooking', 'basic'),
             'scale': Button(rects[1], f'Window Scale ({config.scale}x)', 'basic'),
         }
         self.name_surf = FONTS['basic'].get_surf('Enter your name > ')

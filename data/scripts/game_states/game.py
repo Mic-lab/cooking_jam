@@ -120,7 +120,7 @@ class Customer(Entity):
     def __init__(self, username, *args, **kwargs):
 
         self.DIALOGUES = (
-            ('John Smith', 'Hello. May I please have a sandwhich, but without the filling? Also, don\'t forget to hover your mouse over the ingredients to view their description.',
+            ('John Smith', 'Hello. May I please have a sandwhich, but without the filling?',
              'Exactly as I asked for. Thanks!'),
             ('Bob', 'Hi, I\'d like a sandwhich bagel (not to be confused with a bagel sandwhich)',
              'Oh yeah, that\'s the stuff'),
@@ -278,6 +278,7 @@ class Game(State):
             self.lvl_surf = FONTS['basic'].get_surf(f'')
         else:
             self.lvl_surf = FONTS['basic'].get_surf(f'Level {self.lvl+1} / {len(Customer.ORDERS)}')
+        self.handler.lvl_surf = self.lvl_surf
 
         if config.DEBUG and 0:
             self.lvl_start_timer = Timer(5, done=True)
@@ -379,7 +380,7 @@ class Game(State):
             self.handler.canvas.blit(self.done_img, (200, 60))
             self.done_timer.update()
 
-        canvas.blit(self.lvl_surf, (CANVAS_SIZE[0]*0.5-self.lvl_surf.get_width()*0.5, 5))
+        canvas.blit(self.lvl_surf, (CANVAS_SIZE[0]*0.5-self.lvl_surf.get_width()*0.5, 1))
 
         # Update Buttons
         for key, btn in self.buttons.items():

@@ -23,9 +23,9 @@ class GameHandler:
         self.clock = pygame.time.Clock()
         self.inputs = {'pressed': {}, 'released': {}, 'held': {}}
         self.pending_transition_durations = []
-        self.start_lvl = 5
+        self.start_lvl = 0
         if config.DEBUG:
-            self.lvl = 11
+            self.lvl = self.start_lvl
             self.set_state(self.states.Menu)
             # self.set_state(self.states.Game)
         else:

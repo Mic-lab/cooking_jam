@@ -11,6 +11,7 @@ from ..timer import Timer
 from .. import sfx
 from ..mgl import shader_handler
 from ..particle import ParticleGenerator
+from .. import config
 
 class Grid:
 
@@ -20,6 +21,7 @@ class Grid:
     CENTER_POS = Vec2(423, 130)
 
     cell_img = Animation.img_db['cell']
+
 
     def __init__(self, size, game):
         self.game = game
@@ -379,6 +381,12 @@ class Kitchen(State):
 
     INGREDIENT_BASE_POS = Vec2(185, 40)
 
+    HINTS = {
+        4: 'Put all the bagels in\nthe corners.',
+        6: 'Chicken in center.',
+        11: 'Put the hot sauce and chicken\nin a checkerboard pattern.'
+    }
+
     def __init__(self, *args, **kwargs):
         pygame.mixer.music.set_volume(0.3)
 
@@ -408,6 +416,16 @@ class Kitchen(State):
 
         self.hover_timer = Timer(duration=10)
 
+        if self.lvl in self.HINTS:
+            self.hint_surf = FONTS['basic'].get_surf(self.HINTS[self.lvl], color=COLORS['black2'])
+            self.hidden_hint_surf = FONTS['basic'].get_surf('Press [space] for a hint.', color=COLORS['black2'])
+            self.hint_bg = Animation.img_db['hint']
+        else:
+            self.hint_surf = None
+        self.used_hint = False
+
+        self.lvl_surf = self.handler.lvl_surf
+
         # Generate ingredient data ---------------
         self.ingredient_dict = {}
 
@@ -433,6 +451,23 @@ class Kitchen(State):
     def sub_update(self):
         canvas = self.handler.canvas
         self.handler.canvas.blit(self.bg)
+
+        if self.handler.inputs['pressed'].get('space'):
+            self.used_hint = True
+
+        if self.hint_surf:
+            self.handler.canvas.blit(
+                self.hint_bg, (0, config.CANVAS_SIZE[1] - self.hint_bg.get_height())
+            )
+            pos = (12, 235)
+            if self.used_hint:
+                canvas.blit(self.hint_surf, pos)
+            else:
+                canvas.blit(self.hidden_hint_surf, pos)
+
+        canvas.blit(self.lvl_surf, (config.CANVAS_SIZE[0]*0.5-self.lvl_surf.get_width()*0.5, 1))
+
+
         canvas.blit(self.order_img, (10, 50))
         canvas.blit(self.grid.used_ingredients_surf, Vec2(10, 50) + (80, 2))
 
