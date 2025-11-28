@@ -399,6 +399,9 @@ class Kitchen(State):
         rects = [pygame.Rect(300, 150+i*30, 80, 20) for i in range(4)]
         self.btn_rect = pygame.Rect(self.SCORE_POS.x, self.SCORE_POS.y+35, 80, 20)
         self.buttons = {
+            'clear': Button(
+                pygame.Rect(215, 220, 91, 20), 'Restart level', 'basic'
+            )
         }
         self.lvl = self.handler.lvl
         self.order = self.handler.order
@@ -570,6 +573,8 @@ class Kitchen(State):
                 if key == 'back':
                     self.handler.transition_to(self.handler.states.Game)
                     self.handler.lvl += 1
+                elif key == 'clear':
+                    self.handler.transition_to(self.handler.states.Kitchen)
 
         self.old_mouse_pos = self.handler.inputs['mouse pos']
         shader_handler.vars['caTimer'] = self.ca_timer.ratio ** 2

@@ -97,8 +97,6 @@ class GameHandler:
             if self.transition.state != TransitionState.STARTING:
                 self.state.update()
 
-
-
             self.handle_transition()
 
             shader_handler.surfs['canvasTex'] = self.canvas

@@ -3,8 +3,9 @@ from .config import COLORS
 from .font import FONTS
 from .animation import Animation
 from .sfx import sounds
-from .utils import swap_colors
+from .utils import swap_colors, lerp
 from . import config
+from .timer import Timer
 from pygame import Vector2 as Vec2
 import pygame
 from random import randint
@@ -20,10 +21,10 @@ class Ingredient(Entity):
         txt_1 = 'Ingredients:'
         txt_2 = ''
         w = 150
-        font_surf_1 = FONTS['basic'].get_surf(txt_1, wraplength=w, color=COLORS['black1'])
+        font_surf_1 = FONTS['basic'].get_surf(txt_1, wraplength=w-2, color=COLORS['black1'])
         for quantity, ingredient in order['want']:
             txt_2 += f'    {quantity}x {ingredient}\n'
-        font_surf_2 = FONTS['basic'].get_surf(txt_2, wraplength=w, color=COLORS['blue1'])
+        font_surf_2 = FONTS['basic'].get_surf(txt_2, wraplength=w-2, color=COLORS['blue1'])
 
         h = font_surf_1.get_height() + font_surf_2.get_height()
         s = pygame.Surface((w, h))
@@ -40,7 +41,10 @@ class Ingredient(Entity):
         self.old_pos = self.real_pos.copy()
 
         if inputs['released']['mouse1']:
-            self.selected = False
+            if self.selected:
+                self.selected = False
+                self.select_timer.frame = self.select_timer.duration
+                self.select_timer.done = True
             if self.hovered_cell:
                 if self.hovered_cell[3]:
                     self.real_pos = self.hovered_cell[2].center - 0.5*Vec2(self.rect.size) + Vec2(1, 1)
@@ -52,6 +56,7 @@ class Ingredient(Entity):
             if self.rect.collidepoint(inputs['mouse pos']) and not selected_ingredient:
                 grid.remove_ingredient(self)
                 self.selected = True
+                self.select_timer.reset()
                 sounds['pickup.wav'].play()
 
         if self.selected:
@@ -81,7 +86,7 @@ class Ingredient(Entity):
         if self.real_pos[1] < 10:
             self.real_pos[1] = 10
             
-
+        self.select_timer.update()
     @property
     def description_title(self):
         return self.name.title()
@@ -108,6 +113,7 @@ class Ingredient(Entity):
         self.description = description
         self.group = group
         self.selected = False
+        self.select_timer = Timer(30, done=True)
         self.hovered_cell = None
         self.grid_pos = None
         self.points = 0
@@ -123,6 +129,16 @@ class Ingredient(Entity):
 
     def render(self, surf):
         img = self.img
+        x_scale = lerp(0.5, 1, self.select_timer.easeOutElastic(a=2), clamp=False)
+        y_scale = lerp(0.5, 1, -self.select_timer.easeOutElastic(a=2)+2, clamp=False)
+        img = pygame.transform.scale(img, 
+                                     (img.get_width() * x_scale,
+                                      img.get_height() * y_scale)
+                                     )
+        # scale_offset = -0.5*(Vec2(self.img.get_size()) + img.get_size())
+        # scale_offset = 0.5*(Vec2(self.img.get_size()) - img.get_size())
+        scale_offset = Vec2(0, 0)
+
         shadow = self.shadow
         angle = round(self.angle)
         if angle != 0:
@@ -130,8 +146,12 @@ class Ingredient(Entity):
             shadow = pygame.transform.rotate(shadow, angle)
         offset = 0.5 * (Vec2(img.get_size()) - self.img.get_size())
         if not self.grid_pos:
-            surf.blit(shadow, self.pos - offset + self.SHADOW_OFFSET)
-        surf.blit(img, self.pos - offset)
+            shadow = pygame.transform.scale(shadow, 
+                                         (shadow.get_width() * x_scale,
+                                          shadow.get_height() * y_scale)
+                                         )
+            surf.blit(shadow, self.pos - offset - scale_offset + self.SHADOW_OFFSET)
+        surf.blit(img, self.pos - offset - scale_offset)
 
     def set_points(self, new_points):
         self.points = new_points
@@ -145,7 +165,7 @@ class Ingredient(Entity):
 
 class Bread(Ingredient):
     def __init__(self):
-        description = '''+ 15 if another bread is on the same line.'''
+        description = '''+15 if another bread is on the same line.'''
         super().__init__(name='bread', description=description)
         
     def calculate_points(self, grid):
@@ -171,7 +191,7 @@ class Bread(Ingredient):
 
 class Bagel(Ingredient):
     def __init__(self):
-        description = '''+10 for every ingredient in between bagels'''
+        description = '''+10 for every ingredient in between bagels (only horizontally and vertically)'''
         super().__init__(name='bagel', description=description, group=True)
 
     def calc_func(self, grid, switch=False):
@@ -263,7 +283,7 @@ class Cucumber(Ingredient):
 
 class Chicken(Ingredient):
     def __init__(self):
-        description = '''+5 for every diagonal and adjacent ingredient'''
+        description = '''+5 for every adjacent and diagonal ingredient'''
         super().__init__(name='chicken', description=description)
 
     def calculate_points(self, grid):
@@ -283,7 +303,7 @@ class Chicken(Ingredient):
 
 class Sauce(Ingredient):
     def __init__(self):
-        description = '+20 For every adjacent chicken\n+0 For every adjacent Hot Sauce\n-20 For every adjacent other ingredient'
+        description = '+15 For every adjacent chicken\n+0 For every adjacent Hot Sauce\n-15 For every adjacent other ingredient'
         super().__init__(name='sauce', description=description)
 
     @property

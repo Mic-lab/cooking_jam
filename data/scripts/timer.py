@@ -40,10 +40,12 @@ class Timer:
         return a * max(x+k, 0)**2
 
     C4 = (2 * math.pi) / 3;
-    def easeOutElastic(self):
+    def easeOutElastic(self, c=None, a=1):
         x = self.ratio
         if x in (0, 1): return x
-        return (2 ** (-10 * x)) * math.sin((x * 10 - 0.75) * self.C4) + 1
+        if c is None:
+            c = self.C4
+        return a*(2 ** (-10 * x)) * math.sin((x * 10 - 0.75) * c) + 1
 
 
     @property
